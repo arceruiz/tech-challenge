@@ -1,8 +1,9 @@
-package service
+package adapter
 
 import (
 	"client/internal/canonical"
-	"client/internal/repository"
+	"client/internal/repository/adapters"
+	"client/internal/repository/ports"
 )
 
 type OrderService interface {
@@ -14,12 +15,12 @@ type OrderService interface {
 }
 
 type orderService struct {
-	repo repository.OrderRepository
+	repo ports.OrderRepository
 }
 
 func NewOrderService() OrderService {
 	return &orderService{
-		repository.NewOrderRepo(),
+		adapters.NewOrderRepo(),
 	}
 }
 

@@ -1,6 +1,6 @@
 package port
 
-type UserRequest struct {
+type CustomerRequest struct {
 	Document string `json:"document"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`

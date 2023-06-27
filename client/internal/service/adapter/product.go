@@ -1,8 +1,9 @@
-package service
+package adapter
 
 import (
 	"client/internal/canonical"
-	"client/internal/repository"
+	"client/internal/repository/adapters"
+	"client/internal/repository/ports"
 )
 
 type ProductService interface {
@@ -15,12 +16,12 @@ type ProductService interface {
 }
 
 type productService struct {
-	repo repository.ProductRepository
+	repo ports.ProductRepository
 }
 
 func NewProductService() ProductService {
 	return &productService{
-		repository.NewProductRepo(),
+		adapters.NewProductRepo(),
 	}
 }
 

@@ -1,6 +1,6 @@
 package canonical
 
-type User struct {
+type Customer struct {
 	Id        string
 	Document  string
 	Name      string
@@ -8,6 +8,7 @@ type User struct {
 	Password  string
 	CreatedAt string
 }
+
 type Product struct {
 	ID        string
 	Name      string

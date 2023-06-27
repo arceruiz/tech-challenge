@@ -1,31 +1,18 @@
-package repository
+package adapters
 
 import (
 	"client/internal/canonical"
+	"client/internal/repository"
+	"client/internal/repository/ports"
 	"database/sql"
-
-	"github.com/sirupsen/logrus"
 )
-
-type OrderRepository interface {
-	GetOrders() ([]canonical.Order, error)
-	CreateOrder(order canonical.Order) (canonical.Order, error)
-	UpdateOrder(id string, updatedOrder canonical.Order) (canonical.Order, error)
-	GetByID(id string) (canonical.Order, error)
-	GetByStatus(id string) ([]canonical.Order, error)
-}
 
 type orderRepository struct {
 	db *sql.DB
 }
 
-func NewOrderRepo() OrderRepository {
-	connStr := "host=localhost port=5432 dbname=fiap_tech_challenge user=postgres password=1234 sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	return &orderRepository{db}
+func NewOrderRepo() ports.OrderRepository {
+	return &orderRepository{repository.New()}
 }
 
 func (r *orderRepository) GetOrders() ([]canonical.Order, error) {

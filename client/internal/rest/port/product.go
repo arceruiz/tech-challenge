@@ -2,17 +2,17 @@ package port
 
 import (
 	"client/internal/canonical"
-	"client/internal/service"
+	"client/internal/service/port"
 	"net/http"
 
 	"github.com/labstack/echo"
 )
 
 type ProductPort struct {
-	service service.ProductService
+	service port.ProductService
 }
 
-func NewProductPort(productService service.ProductService) *ProductPort {
+func NewProductPort(productService port.ProductService) *ProductPort {
 	return &ProductPort{
 		service: productService,
 	}

@@ -1,31 +1,21 @@
-package repository
+package adapters
 
 import (
 	"client/internal/canonical"
+	"client/internal/repository"
+	"client/internal/repository/ports"
 	"database/sql"
-
-	"github.com/sirupsen/logrus"
 )
 
-type UserRepository interface {
-	Create(canonical.User) error
-	GetByEmail(email string) (*canonical.User, error)
-}
-
-type userRepository struct {
+type customerRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepo() UserRepository {
-	connStr := "host=localhost port=5432 dbname=fiap_tech_challenge user=postgres password=1234 sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	return &userRepository{db}
+func NewCustomerRepo() ports.CustomerRepository {
+	return &customerRepository{repository.New()}
 }
 
-func (r *userRepository) Create(user canonical.User) error {
+func (r *customerRepository) Create(user canonical.Customer) error {
 	sqlStatement := "INSERT INTO CUSTOMER (id, name, email, password, document, createdAt) VALUES ($1, $2, $3, $4, $5, $6)"
 
 	_, err := r.db.Exec(sqlStatement, user.Id, user.Name, user.Email, user.Password, user.Document, user.CreatedAt)
@@ -36,7 +26,7 @@ func (r *userRepository) Create(user canonical.User) error {
 	return nil
 }
 
-func (r *userRepository) GetByEmail(email string) (*canonical.User, error) {
+func (r *customerRepository) GetByEmail(email string) (*canonical.Customer, error) {
 	rows, err := r.db.Query(
 		"SELECT * FROM Customer WHERE Email = $1",
 		email,
@@ -47,7 +37,7 @@ func (r *userRepository) GetByEmail(email string) (*canonical.User, error) {
 
 	defer rows.Close()
 
-	var user canonical.User
+	var user canonical.Customer
 
 	if rows.Next() {
 		if err = rows.Scan(
@@ -63,5 +53,5 @@ func (r *userRepository) GetByEmail(email string) (*canonical.User, error) {
 		return &user, nil
 	}
 
-	return &user, errorNotFound
+	return &user, repository.ErrorNotFound
 }
