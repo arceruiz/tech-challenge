@@ -8,3 +8,28 @@ type User struct {
 	Password  string
 	CreatedAt string
 }
+type Product struct {
+	ID        string
+	Name      string
+	Desc      string
+	Price     string
+	Category  string
+	Status    string
+	ImagePath string
+}
+
+type Order struct {
+	ID         string
+	CustomerID string
+	PaymentID  string
+	Status     string
+	CreatedAt  string
+	UpdatedAt  string
+	Total      string
+	OrderItems []OrderItem
+}
+
+type OrderItem struct {
+	Product  Product
+	Quantity int
+}

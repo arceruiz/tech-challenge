@@ -14,10 +14,11 @@ func Logger(fx echo.HandlerFunc) echo.HandlerFunc {
 		log := logrus.WithContext(context.Background())
 		request := ctx.Request()
 		log.WithFields(logrus.Fields{
-			log.Message: request.RequestURI,
-			log.Message: request.Method,
-			log.Message: request.Host,
-		})
+			"Host":   request.Host,
+			"URI":    request.RequestURI,
+			"Method": request.Method,
+		}).Info()
+
 		return fx(ctx)
 	}
 }
