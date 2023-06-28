@@ -3,9 +3,9 @@ package port
 import "client/internal/canonical"
 
 type CustomerService interface {
-	Create(canonical.Customer) (canonical.Customer, error)
+	Create(canonical.Customer) (*canonical.Customer, error)
 	Login(user canonical.Customer) (string, error)
-	Bypass()
+	Bypass() (string, error)
 }
 
 type OrderService interface {

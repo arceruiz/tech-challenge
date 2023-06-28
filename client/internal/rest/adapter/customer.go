@@ -1,8 +1,11 @@
-package port
+package adapter
 
 import (
 	"client/internal/canonical"
+	"fmt"
 
+	restPorts "client/internal/rest/port"
+	"client/internal/service/adapter"
 	"client/internal/service/port"
 	"net/http"
 	"time"
@@ -10,27 +13,27 @@ import (
 	"github.com/labstack/echo"
 )
 
-type CustomerPort struct {
+type customerPort struct {
 	service port.CustomerService
 }
 
-func NewUserPort(userService port.CustomerService) *CustomerPort {
-	return &CustomerPort{
-		service: userService,
+func NewCustomerPort() restPorts.CustomerPort {
+	return &customerPort{
+		service: adapter.NewCustomerService(),
 	}
 }
 
-func (u *CustomerPort) Create(g *echo.Group) {
-	g.POST("/create", u.create)
-	g.POST("/login", u.login)
+func (u *customerPort) Register(g *echo.Group) {
+	g.POST("/create", u.Create)
+	g.POST("/login", u.Login)
 	g.POST("/bypass", echo.MethodNotAllowedHandler)
 }
 
-func (u *CustomerPort) create(c echo.Context) error {
+func (u *customerPort) Create(c echo.Context) error {
 	var customerRequest CustomerRequest
 
 	if err := c.Bind(&customerRequest); err != nil {
-		return c.JSON(400, "dados incorretos")
+		return c.JSON(http.StatusBadRequest, fmt.Errorf("invalid data"))
 	}
 
 	customer, err := u.service.Create(canonical.Customer{
@@ -42,17 +45,17 @@ func (u *CustomerPort) create(c echo.Context) error {
 	})
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "implementar um map pra erros, algo assim")
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	return c.JSON(http.StatusOK, customer)
 }
 
-func (u *CustomerPort) login(c echo.Context) error {
+func (u *customerPort) Login(c echo.Context) error {
 	var customerLogin CustomerRequest
 
 	if err := c.Bind(&customerLogin); err != nil {
-		return c.JSON(400, "Login ou senha incorretos")
+		return c.JSON(http.StatusBadRequest, fmt.Errorf("invalid data"))
 	}
 
 	token, err := u.service.Login(canonical.Customer{
@@ -60,9 +63,19 @@ func (u *CustomerPort) login(c echo.Context) error {
 		Password: customerLogin.Password,
 	})
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
+	return c.JSON(http.StatusOK, TokenResponse{
+		Token: token,
+	})
+}
+
+func (u *customerPort) Bypass(c echo.Context) error {
+	token, err := u.service.Bypass()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
 	return c.JSON(http.StatusOK, TokenResponse{
 		Token: token,
 	})

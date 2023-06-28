@@ -3,7 +3,7 @@ package adapters
 import (
 	"client/internal/canonical"
 	"client/internal/repository"
-	"client/internal/repository/ports"
+	"client/internal/repository/port"
 	"database/sql"
 )
 
@@ -11,7 +11,7 @@ type customerRepository struct {
 	db *sql.DB
 }
 
-func NewCustomerRepo() ports.CustomerRepository {
+func NewCustomerRepo() port.CustomerRepository {
 	return &customerRepository{repository.New()}
 }
 
@@ -53,5 +53,5 @@ func (r *customerRepository) GetByEmail(email string) (*canonical.Customer, erro
 		return &user, nil
 	}
 
-	return &user, repository.ErrorNotFound
+	return nil, repository.ErrorNotFound
 }

@@ -3,7 +3,7 @@ package adapter
 import (
 	"client/internal/canonical"
 	"client/internal/repository/adapters"
-	"client/internal/repository/ports"
+	"client/internal/repository/port"
 )
 
 type ProductService interface {
@@ -16,7 +16,7 @@ type ProductService interface {
 }
 
 type productService struct {
-	repo ports.ProductRepository
+	repo port.ProductRepository
 }
 
 func NewProductService() ProductService {

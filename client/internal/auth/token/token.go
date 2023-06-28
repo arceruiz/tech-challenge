@@ -12,6 +12,10 @@ import (
 
 func GenerateToken(userId string) (string, error) {
 	permissions := jwt.MapClaims{}
+
+	if userId == "guest" {
+		permissions["guest"] = true
+	}
 	permissions["authorized"] = true
 	permissions["exp"] = time.Now().Add(time.Hour * 6).Unix()
 	permissions["userId"] = userId

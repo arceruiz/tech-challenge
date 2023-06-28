@@ -1,4 +1,4 @@
-package port
+package adapter
 
 type CustomerRequest struct {
 	Document string `json:"document"`

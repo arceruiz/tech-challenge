@@ -3,7 +3,7 @@ package adapters
 import (
 	"client/internal/canonical"
 	"client/internal/repository"
-	"client/internal/repository/ports"
+	"client/internal/repository/port"
 	"database/sql"
 )
 
@@ -11,7 +11,7 @@ type orderRepository struct {
 	db *sql.DB
 }
 
-func NewOrderRepo() ports.OrderRepository {
+func NewOrderRepo() port.OrderRepository {
 	return &orderRepository{repository.New()}
 }
 

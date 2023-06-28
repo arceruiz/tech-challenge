@@ -2,36 +2,36 @@ package rest
 
 import (
 	"client/internal/middlewares"
+	adapterRest "client/internal/rest/adapter"
 	"client/internal/rest/port"
-	"client/internal/service/adapter"
 
 	"github.com/labstack/echo"
 )
 
 type rest struct {
-	customer *port.CustomerPort
-	product  *port.ProductPort
+	customer port.CustomerPort
+	product  port.ProductPort
 }
 
-func New() *rest {
-	return &rest{
-		customer: port.NewUserPort(adapter.NewCustomerService()),
-		product:  port.NewProductPort(adapter.NewProductService()),
+func New() rest {
+	return rest{
+		customer: adapterRest.NewCustomerPort(),
+		product:  adapterRest.NewProductPort(),
 	}
 }
 
-func (r *rest) Start() error {
+func (r rest) Start() error {
 	router := echo.New()
 
 	router.Use(middlewares.Logger)
 
-	mainPort := router.Group("/api")
+	mainGroup := router.Group("/api")
 
-	customerPort := mainPort.Group("/user")
-	r.customer.Create(customerPort)
+	customerGroup := mainGroup.Group("/user")
+	r.customer.Register(customerGroup)
 
-	productPort := mainPort.Group("/product")
-	r.product.Register(productPort)
+	productGroup := mainGroup.Group("/product")
+	r.product.Register(productGroup)
 
 	return router.Start(":3001")
 }
