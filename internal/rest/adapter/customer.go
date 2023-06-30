@@ -33,7 +33,9 @@ func (u *customerPort) Create(c echo.Context) error {
 	var customerRequest CustomerRequest
 
 	if err := c.Bind(&customerRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, fmt.Errorf("invalid data"))
+		return c.JSON(http.StatusBadRequest, Response{
+			Message: fmt.Errorf("invalid data").Error(),
+		})
 	}
 
 	customer, err := u.service.Create(canonical.Customer{
@@ -45,7 +47,9 @@ func (u *customerPort) Create(c echo.Context) error {
 	})
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, Response{
+			Message: err.Error(),
+		})
 	}
 
 	return c.JSON(http.StatusOK, CustomerResponse{
@@ -60,7 +64,9 @@ func (u *customerPort) Login(c echo.Context) error {
 	var customerLogin CustomerRequest
 
 	if err := c.Bind(&customerLogin); err != nil {
-		return c.JSON(http.StatusBadRequest, fmt.Errorf("invalid data"))
+		return c.JSON(http.StatusBadRequest, Response{
+			Message: fmt.Errorf("invalid data").Error(),
+		})
 	}
 
 	token, err := u.service.Login(canonical.Customer{
@@ -68,7 +74,7 @@ func (u *customerPort) Login(c echo.Context) error {
 		Password: customerLogin.Password,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, Response{err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, TokenResponse{
@@ -79,7 +85,7 @@ func (u *customerPort) Login(c echo.Context) error {
 func (u *customerPort) Bypass(c echo.Context) error {
 	token, err := u.service.Bypass()
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, Response{err.Error()})
 	}
 	return c.JSON(http.StatusOK, TokenResponse{
 		Token: token,
