@@ -1,13 +1,13 @@
 package adapter
 
 import (
-	"client/internal/canonical"
 	"fmt"
+	"tech-challenge/internal/canonical"
 
-	restPorts "client/internal/rest/port"
-	"client/internal/service/adapter"
-	"client/internal/service/port"
 	"net/http"
+	restPorts "tech-challenge/internal/rest/port"
+	"tech-challenge/internal/service/adapter"
+	"tech-challenge/internal/service/port"
 	"time"
 
 	"github.com/labstack/echo"
@@ -41,14 +41,19 @@ func (u *customerPort) Create(c echo.Context) error {
 		Email:     customerRequest.Email,
 		Name:      customerRequest.Name,
 		Password:  customerRequest.Password,
-		CreatedAt: time.Now().String(),
+		CreatedAt: time.Now().Format(time.RFC822Z),
 	})
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, customer)
+	return c.JSON(http.StatusOK, CustomerResponse{
+		ID:       customer.Id,
+		Name:     customer.Name,
+		Document: customer.Document,
+		Email:    customer.Email,
+	})
 }
 
 func (u *customerPort) Login(c echo.Context) error {
@@ -63,7 +68,7 @@ func (u *customerPort) Login(c echo.Context) error {
 		Password: customerLogin.Password,
 	})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, TokenResponse{
@@ -74,7 +79,7 @@ func (u *customerPort) Login(c echo.Context) error {
 func (u *customerPort) Bypass(c echo.Context) error {
 	token, err := u.service.Bypass()
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, TokenResponse{
 		Token: token,

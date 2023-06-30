@@ -1,10 +1,10 @@
 package adapter
 
 import (
-	"client/internal/canonical"
-	restPorts "client/internal/rest/port"
-	"client/internal/service/adapter"
-	"client/internal/service/port"
+	"tech-challenge/internal/canonical"
+	restPorts "tech-challenge/internal/rest/port"
+	"tech-challenge/internal/service/adapter"
+	"tech-challenge/internal/service/port"
 
 	"net/http"
 

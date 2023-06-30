@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"client/internal/auth/token"
 	"context"
 	"net/http"
+	"tech-challenge/internal/auth/token"
 
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"

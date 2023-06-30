@@ -1,10 +1,10 @@
 package rest
 
 import (
-	"client/internal/config"
-	"client/internal/middlewares"
-	adapterRest "client/internal/rest/adapter"
-	"client/internal/rest/port"
+	"tech-challenge/internal/config"
+	"tech-challenge/internal/middlewares"
+	adapterRest "tech-challenge/internal/rest/adapter"
+	"tech-challenge/internal/rest/port"
 
 	"github.com/labstack/echo"
 )

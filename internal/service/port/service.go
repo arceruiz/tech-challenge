@@ -1,6 +1,6 @@
 package port
 
-import "client/internal/canonical"
+import "tech-challenge/internal/canonical"
 
 type CustomerService interface {
 	Create(canonical.Customer) (*canonical.Customer, error)

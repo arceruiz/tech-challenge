@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"client/internal/config"
 	"database/sql"
 	"errors"
+	"tech-challenge/internal/config"
 
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"

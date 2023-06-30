@@ -1,9 +1,9 @@
 package rest
 
 import (
-	"client/internal/canonical"
 	"errors"
 	"net/http"
+	"tech-challenge/internal/canonical"
 )
 
 func HandleError(err error) int {

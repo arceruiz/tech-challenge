@@ -1,9 +1,9 @@
 package adapter
 
 import (
-	"client/internal/canonical"
-	"client/internal/repository/adapters"
-	"client/internal/repository/port"
+	"tech-challenge/internal/canonical"
+	"tech-challenge/internal/repository/adapters"
+	"tech-challenge/internal/repository/port"
 )
 
 type OrderService interface {

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"client/internal/config"
-	"client/internal/rest"
+	"tech-challenge/internal/config"
+	"tech-challenge/internal/rest"
 
 	"github.com/sirupsen/logrus"
 )

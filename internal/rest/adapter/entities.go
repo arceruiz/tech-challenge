@@ -10,3 +10,10 @@ type CustomerRequest struct {
 type TokenResponse struct {
 	Token string `json:"token"`
 }
+
+type CustomerResponse struct {
+	ID       string `json:"id"`
+	Document string `json:"document"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+}

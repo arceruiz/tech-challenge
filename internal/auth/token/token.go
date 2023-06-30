@@ -1,11 +1,11 @@
 package token
 
 import (
-	"client/internal/config"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
+	"tech-challenge/internal/config"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"

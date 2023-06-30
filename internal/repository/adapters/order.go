@@ -1,10 +1,10 @@
 package adapters
 
 import (
-	"client/internal/canonical"
-	"client/internal/repository"
-	"client/internal/repository/port"
 	"database/sql"
+	"tech-challenge/internal/canonical"
+	"tech-challenge/internal/repository"
+	"tech-challenge/internal/repository/port"
 )
 
 type orderRepository struct {

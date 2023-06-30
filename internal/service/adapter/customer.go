@@ -1,14 +1,14 @@
 package adapter
 
 import (
-	"client/internal/auth/token"
-	"client/internal/canonical"
-	"client/internal/repository/adapters"
-	repositoryPorts "client/internal/repository/port"
-	"client/internal/service/port"
+	"tech-challenge/internal/auth/token"
+	"tech-challenge/internal/canonical"
+	"tech-challenge/internal/repository/adapters"
+	repositoryPorts "tech-challenge/internal/repository/port"
+	"tech-challenge/internal/service/port"
 
-	"client/internal/security"
 	"fmt"
+	"tech-challenge/internal/security"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
