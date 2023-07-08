@@ -8,9 +8,9 @@ import (
 
 type ProductService interface {
 	GetProducts() ([]canonical.Product, error)
-	CreateProduct(product canonical.Product) (canonical.Product, error)
-	UpdateProduct(id string, updatedProduct canonical.Product) (canonical.Product, error)
-	GetByID(id string) (canonical.Product, error)
+	CreateProduct(product canonical.Product) error
+	UpdateProduct(id string, updatedProduct canonical.Product) error
+	GetByID(id string) (*canonical.Product, error)
 	GetByCategory(id string) ([]canonical.Product, error)
 	Remove(id string) error
 }
@@ -29,15 +29,15 @@ func (s *productService) GetProducts() ([]canonical.Product, error) {
 	return s.repo.GetProducts()
 }
 
-func (s *productService) CreateProduct(product canonical.Product) (canonical.Product, error) {
+func (s *productService) CreateProduct(product canonical.Product) error {
 	return s.repo.CreateProduct(product)
 }
 
-func (s *productService) UpdateProduct(id string, updatedProduct canonical.Product) (canonical.Product, error) {
+func (s *productService) UpdateProduct(id string, updatedProduct canonical.Product) error {
 	return s.repo.UpdateProduct(id, updatedProduct)
 }
 
-func (s *productService) GetByID(id string) (canonical.Product, error) {
+func (s *productService) GetByID(id string) (*canonical.Product, error) {
 	return s.repo.GetByID(id)
 }
 
@@ -50,8 +50,11 @@ func (s *productService) Remove(id string) error {
 	if err != nil {
 		return err
 	}
-	product.Status = "REMOVED"
-	_, err = s.repo.UpdateProduct(id, product)
+	if product == nil {
+		return canonical.ErrorNotFound
+	}
+	product.Status = "INACTIVE"
+	err = s.repo.UpdateProduct(id, *product)
 	if err != nil {
 		return err
 	}

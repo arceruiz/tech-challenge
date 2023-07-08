@@ -23,8 +23,8 @@ func NewProductPort() restPorts.ProductPort {
 
 func (p *ProductPort) Register(g *echo.Group) {
 	indexPath := ""
-	g.GET(indexPath, p.Get)  // localhost:3001/api/product
-	g.POST(indexPath, p.Add) // localhost:3001/api/product
+	g.GET(indexPath, p.Get)
+	g.POST(indexPath, p.Add)
 	g.PUT(indexPath+"/:id", p.Update)
 	g.DELETE(indexPath+"/:id", p.Remove)
 }
@@ -63,12 +63,12 @@ func (p *ProductPort) Add(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	addedProduct, err := p.service.CreateProduct(newProduct)
+	err = p.service.CreateProduct(newProduct)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, addedProduct)
+	return c.JSON(http.StatusCreated, nil)
 }
 
 func (p *ProductPort) Update(c echo.Context) error {
@@ -80,12 +80,12 @@ func (p *ProductPort) Update(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	updatedProduct, err = p.service.UpdateProduct(productID, updatedProduct)
+	err = p.service.UpdateProduct(productID, updatedProduct)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, "Product not found")
 	}
 
-	return c.JSON(http.StatusOK, updatedProduct)
+	return c.JSON(http.StatusOK, nil)
 }
 
 func (p *ProductPort) Remove(c echo.Context) error {
