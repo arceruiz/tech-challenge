@@ -15,3 +15,9 @@ type CustomerPort interface {
 	Create(c echo.Context) error
 	Login(c echo.Context) error
 }
+
+type OrderPort interface {
+	Register(g *echo.Group)
+	Get(c echo.Context) error
+	CheckoutOrder(c echo.Context) error
+}

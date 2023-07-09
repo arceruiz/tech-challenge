@@ -3,23 +3,17 @@ package adapter
 import (
 	"tech-challenge/internal/canonical"
 	"tech-challenge/internal/repository/adapters"
-	"tech-challenge/internal/repository/port"
+	repos "tech-challenge/internal/repository/port"
+	services "tech-challenge/internal/service/port"
+
+	"github.com/google/uuid"
 )
 
-type ProductService interface {
-	GetProducts() ([]canonical.Product, error)
-	CreateProduct(product canonical.Product) error
-	UpdateProduct(id string, updatedProduct canonical.Product) error
-	GetByID(id string) (*canonical.Product, error)
-	GetByCategory(id string) ([]canonical.Product, error)
-	Remove(id string) error
-}
-
 type productService struct {
-	repo port.ProductRepository
+	repo repos.ProductRepository
 }
 
-func NewProductService() ProductService {
+func NewProductService() services.ProductService {
 	return &productService{
 		adapters.NewProductRepo(),
 	}
@@ -30,6 +24,7 @@ func (s *productService) GetProducts() ([]canonical.Product, error) {
 }
 
 func (s *productService) CreateProduct(product canonical.Product) error {
+	product.ID = uuid.NewString()
 	return s.repo.CreateProduct(product)
 }
 

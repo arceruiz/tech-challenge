@@ -3,23 +3,17 @@ package adapter
 import (
 	"tech-challenge/internal/canonical"
 	"tech-challenge/internal/repository/adapters"
-	"tech-challenge/internal/repository/port"
+	repos "tech-challenge/internal/repository/port"
+	services "tech-challenge/internal/service/port"
+
+	"github.com/google/uuid"
 )
 
-type OrderService interface {
-	GetOrders() ([]canonical.Order, error)
-	CreateOrder(order canonical.Order) error
-	UpdateOrder(id string, updatedOrder canonical.Order) (canonical.Order, error)
-	GetByID(id string) (*canonical.Order, error)
-	GetByStatus(id string) ([]canonical.Order, error)
-	CheckoutOrder(orderID string, payment canonical.Payment) error
-}
-
 type orderService struct {
-	repo port.OrderRepository
+	repo repos.OrderRepository
 }
 
-func NewOrderService() OrderService {
+func NewOrderService() services.OrderService {
 	return &orderService{
 		adapters.NewOrderRepo(),
 	}
@@ -30,6 +24,7 @@ func (s *orderService) GetOrders() ([]canonical.Order, error) {
 }
 
 func (s *orderService) CreateOrder(order canonical.Order) error {
+	order.ID = uuid.NewString()
 	return s.repo.CreateOrder(order)
 }
 
@@ -48,8 +43,8 @@ func (s *orderService) GetByStatus(id string) ([]canonical.Order, error) {
 func (s *orderService) CheckoutOrder(orderID string, payment canonical.Payment) error {
 	err := s.repo.CheckoutOrder(orderID, payment)
 	if err != nil {
-		return nil
+		return err
 	}
 
-	return
+	return nil
 }
