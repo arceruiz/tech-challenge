@@ -10,13 +10,13 @@ type Customer struct {
 }
 
 type Product struct {
-	ID        string
-	Name      string
-	Desc      string
-	Price     string
-	Category  string
-	Status    string
-	ImagePath string
+	ID          string
+	Name        string
+	Description string
+	Price       string
+	Category    string
+	Status      string
+	ImagePath   string
 }
 
 type Order struct {
@@ -33,4 +33,10 @@ type Order struct {
 type OrderItem struct {
 	Product  Product
 	Quantity int
+}
+
+type Payment struct {
+	ID          string
+	PaymentType string
+	CreatedAt   string
 }

@@ -19,12 +19,13 @@ CREATE TABLE Product (
   Description VARCHAR(255),
   Price DECIMAL,
   Category VARCHAR(255),
+  Status VARCHAR(255),
   Imagepath VARCHAR(255)
 );
 
 CREATE TABLE "Order_Items" (
   ID VARCHAR(255) PRIMARY KEY,
-  OrderID VARCHAR(255) REFERENCES "Order"(ID),
+  OrderID VARCHAR(255) REFERENCES Order(ID),
   ProductID VARCHAR(255) REFERENCES Product(ID),
   Quantity VARCHAR(255)
 );
@@ -32,12 +33,16 @@ CREATE TABLE "Order_Items" (
 CREATE TABLE "Order" (
   ID VARCHAR(255) PRIMARY KEY,
   CustomerID VARCHAR(255) REFERENCES Customer(ID),
-  Status VARCHAR(255)
+  PaymentID VARCHAR(255) REFERENCES Payment(ID),
+  Status VARCHAR(255),
+  CreatedAt VARCHAR(255),
+  UpdatedAt VARCHAR(255),
+  Total VARCHAR(255)
 );
 
 CREATE TABLE Payment (
   ID VARCHAR(255) PRIMARY KEY,
-  PaymentType INT,
+  PaymentType VARCHAR(255),
   CreatedAt VARCHAR(255)
 );
 

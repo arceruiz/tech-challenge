@@ -10,17 +10,18 @@ type CustomerService interface {
 
 type OrderService interface {
 	GetOrders() ([]canonical.Order, error)
-	CreateOrder(order canonical.Order) (canonical.Order, error)
+	CreateOrder(order canonical.Order) error
 	UpdateOrder(id string, updatedOrder canonical.Order) (canonical.Order, error)
-	GetByID(id string) (canonical.Order, error)
+	GetByID(id string) (*canonical.Order, error)
 	GetByStatus(id string) ([]canonical.Order, error)
+	CheckoutOrder(orderID string, payment canonical.Payment) error
 }
 
 type ProductService interface {
 	GetProducts() ([]canonical.Product, error)
-	CreateProduct(product canonical.Product) (canonical.Product, error)
-	UpdateProduct(id string, updatedProduct canonical.Product) (canonical.Product, error)
-	GetByID(id string) (canonical.Product, error)
+	CreateProduct(product canonical.Product) error
+	UpdateProduct(id string, updatedProduct canonical.Product) error
+	GetByID(id string) (*canonical.Product, error)
 	GetByCategory(id string) ([]canonical.Product, error)
 	Remove(id string) error
 }
