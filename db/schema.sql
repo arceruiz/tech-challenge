@@ -3,7 +3,7 @@ CREATE DATABASE FIAP_TECH_CHALLENGE;
 -- Utilização do banco de dados
 \c FIAP_TECH_CHALLENGE;
 
--- Criação das tabelas
+-- Criação das tabelasaa a   
 CREATE TABLE Customer (
   ID VARCHAR(255) PRIMARY KEY,
   Name VARCHAR(255),
@@ -14,7 +14,7 @@ CREATE TABLE Customer (
 );
 
 CREATE TABLE Product (
-  ID VARCHAR(255) PRIMARY KEY,
+  ID VARCHAR(255) PRIMARY KEY,      
   Name VARCHAR(255),
   Description VARCHAR(255),
   Price DECIMAL,
@@ -24,7 +24,7 @@ CREATE TABLE Product (
 );
 
 CREATE TABLE "Order_Items" (
-  ID VARCHAR(255) PRIMARY KEY,
+  ID VARCHAR(255) PRIMARY KEY,aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   OrderID VARCHAR(255) REFERENCES Order(ID),
   ProductID VARCHAR(255) REFERENCES Product(ID),
   Quantity VARCHAR(255)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"tech-challenge/internal/config"
 	"tech-challenge/internal/rest"
 
@@ -13,4 +14,8 @@ func main() {
 	if err := rest.New().Start(); err != nil {
 		logrus.Panic()
 	}
+}
+
+func testefunc() {
+	fmt.Printf("Olá Rapazes gostosos")
 }
