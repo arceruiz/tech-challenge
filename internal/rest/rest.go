@@ -3,8 +3,6 @@ package rest
 import (
 	"tech-challenge/internal/config"
 	"tech-challenge/internal/middlewares"
-	adapterRest "tech-challenge/internal/rest/adapter"
-	"tech-challenge/internal/rest/port"
 
 	"github.com/labstack/echo"
 )
@@ -14,14 +12,16 @@ var (
 )
 
 type rest struct {
-	customer port.CustomerPort
-	product  port.ProductPort
+	customer Customer
+	product  Product
+	order    Order
 }
 
 func New() rest {
 	return rest{
-		customer: adapterRest.NewCustomerPort(),
-		product:  adapterRest.NewProductPort(),
+		customer: NewCustomerChannel(),
+		product:  NewProductChannel(),
+		order:    NewOrderChannel(),
 	}
 }
 
@@ -37,6 +37,10 @@ func (r rest) Start() error {
 
 	productGroup := mainGroup.Group("/product")
 	r.product.Register(productGroup)
+	productGroup.Use(middlewares.Authorization)
+
+	orderGroup := mainGroup.Group("/order")
+	r.order.Register(orderGroup)
 	productGroup.Use(middlewares.Authorization)
 
 	return router.Start(":" + cfg.Server.Port)
