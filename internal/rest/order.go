@@ -31,30 +31,30 @@ func (p *order) RegisterGroup(g *echo.Group) {
 }
 
 func (p *order) Get(c echo.Context) error {
-	productID := c.QueryParam("id")
+	orderID := c.QueryParam("id")
 	status := c.QueryParam("status")
 
-	if productID != "" {
-		product, err := p.service.GetByID(productID)
+	if orderID != "" {
+		order, err := p.service.GetByID(orderID)
 		if err != nil {
 			return c.JSON(http.StatusNotFound, "Order not found")
 		}
-		return c.JSON(http.StatusOK, product)
+		return c.JSON(http.StatusOK, order)
 	}
 
 	if status != "" {
-		products, err := p.service.GetByStatus(status)
+		orders, err := p.service.GetByStatus(status)
 		if err != nil {
 			return err
 		}
-		return c.JSON(http.StatusOK, products)
+		return c.JSON(http.StatusOK, orders)
 	}
 
-	products, err := p.service.GetOrders()
+	orders, err := p.service.GetOrders()
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, products)
+	return c.JSON(http.StatusOK, orders)
 }
 
 func (p *order) CheckoutOrder(c echo.Context) error {
