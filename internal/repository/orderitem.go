@@ -13,7 +13,7 @@ type OrderItemRepository interface {
 
 func (r *orderRepository) GetOrderItemsFromOrderID(orderID string) ([]OrderItem, error) {
 	orderItemRows, err := r.db.Query(
-		"SELECT * FROM OrderItem WEHERE OrderID = ?",
+		"SELECT * FROM \"OrderItem\" WEHERE OrderID = ?",
 		orderID,
 	)
 	if err != nil {
@@ -40,7 +40,7 @@ func (r *orderRepository) GetOrderItemsFromOrderID(orderID string) ([]OrderItem,
 }
 
 func (r *orderRepository) CreateOrderItem(cannonOrderItem canonical.OrderItem, orderID string) error {
-	sqlStatement := "INSERT INTO Product (ID, OrderID, ProductID, Quantity) VALUES ($1, $2, $3, $4)"
+	sqlStatement := "INSERT INTO \"Product\" (ID, OrderID, ProductID, Quantity) VALUES ($1, $2, $3, $4)"
 	orderItem := mapCannonOrderItem(cannonOrderItem, orderID)
 	_, err := r.db.Exec(sqlStatement, orderItem.ID, orderItem.OrderID, orderItem.ProductID, orderItem.Quantity)
 	if err != nil {

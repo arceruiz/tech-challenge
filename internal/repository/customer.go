@@ -19,7 +19,7 @@ func NewCustomerRepo() CustomerRepository {
 }
 
 func (r *customerRepository) Create(user canonical.Customer) error {
-	sqlStatement := "INSERT INTO CUSTOMER (id, name, email, password, document, createdAt) VALUES ($1, $2, $3, $4, $5, $6)"
+	sqlStatement := "INSERT INTO \"Customer\" (id, name, email, password, document, createdAt) VALUES ($1, $2, $3, $4, $5, $6)"
 
 	_, err := r.db.Exec(sqlStatement, user.Id, user.Name, user.Email, user.Password, user.Document, user.CreatedAt)
 	if err != nil {
@@ -31,7 +31,7 @@ func (r *customerRepository) Create(user canonical.Customer) error {
 
 func (r *customerRepository) GetByEmail(email string) (*canonical.Customer, error) {
 	rows, err := r.db.Query(
-		"SELECT * FROM Customer WHERE Email = $1",
+		"SELECT * FROM \"Customer\" WHERE Email = $1",
 		email,
 	)
 	if err != nil {

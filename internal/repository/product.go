@@ -23,7 +23,7 @@ func NewProductRepo() ProductRepository {
 
 func (r *productRepository) GetProducts() ([]canonical.Product, error) {
 	rows, err := r.db.Query(
-		"SELECT * FROM Product WHERE Status = 'ACTIVE'",
+		"SELECT * FROM \"Product\" WHERE Status = 'ACTIVE'",
 	)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (r *productRepository) GetProducts() ([]canonical.Product, error) {
 }
 
 func (r *productRepository) CreateProduct(product canonical.Product) error {
-	sqlStatement := "INSERT INTO Product (ID, Name, Description, Price, Category, Status, Imagepath) VALUES ($1, $2, $3, $4, $5, $6, $7)"
+	sqlStatement := "INSERT INTO \"Product\" (ID, Name, Description, Price, Category, Status, Imagepath) VALUES ($1, $2, $3, $4, $5, $6, $7)"
 
 	_, err := r.db.Exec(sqlStatement, product.ID, product.Name, product.Description, product.Price, product.Category, product.Status, product.ImagePath)
 	if err != nil {
@@ -62,7 +62,7 @@ func (r *productRepository) CreateProduct(product canonical.Product) error {
 }
 
 func (r *productRepository) UpdateProduct(id string, product canonical.Product) error {
-	sqlStatement := "UPDATE Product SET Name = ?, Description = ?, Price = ?, Category = ?, Status = ?, Imagepath = ? WHERE ID = ?"
+	sqlStatement := "UPDATE \"Product\" SET Name = ?, Description = ?, Price = ?, Category = ?, Status = ?, Imagepath = ? WHERE ID = ?"
 
 	_, err := r.db.Exec(sqlStatement, product.Name, product.Description, product.Price, product.Category, product.Status, product.ImagePath, id)
 	if err != nil {
@@ -73,7 +73,7 @@ func (r *productRepository) UpdateProduct(id string, product canonical.Product) 
 
 func (r *productRepository) GetByID(id string) (*canonical.Product, error) {
 	rows, err := r.db.Query(
-		"SELECT * FROM Product WHERE ID = $1",
+		"SELECT * FROM \"Product\" WHERE ID = $1",
 		id,
 	)
 	if err != nil {
@@ -102,7 +102,7 @@ func (r *productRepository) GetByID(id string) (*canonical.Product, error) {
 
 func (r *productRepository) GetByCategory(Category string) ([]canonical.Product, error) {
 	rows, err := r.db.Query(
-		"SELECT * FROM Product WHERE Category = $1",
+		"SELECT * FROM \"Product\" WHERE Category = $1",
 		Category,
 	)
 	if err != nil {

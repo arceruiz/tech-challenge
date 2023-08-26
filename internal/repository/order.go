@@ -25,7 +25,7 @@ func NewOrderRepo() OrderRepository {
 
 func (r *orderRepository) GetOrders() ([]canonical.Order, error) {
 	orderRows, err := r.db.Query(
-		"SELECT * FROM Order",
+		"SELECT * FROM \"Order\"",
 	)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (r *orderRepository) GetOrders() ([]canonical.Order, error) {
 }
 
 func (r *orderRepository) CreateOrder(order canonical.Order) error {
-	sqlStatement := "INSERT INTO Order (ID, CustomerID, PaymentID, Status , CreatedAt , UpdatedAt , Total) VALUES ($1, $2, $3, $4, $5, $6, $7)"
+	sqlStatement := "INSERT INTO \"Order\" (ID, CustomerID, PaymentID, Status , CreatedAt , UpdatedAt , Total) VALUES ($1, $2, $3, $4, $5, $6, $7)"
 
 	_, err := r.db.Exec(sqlStatement, order.ID, order.CustomerID, order.PaymentID, order.Status, order.CreatedAt, order.UpdatedAt, order.Total)
 	if err != nil {
@@ -101,7 +101,7 @@ func (r *orderRepository) UpdateOrder(id string, updatedOrder canonical.Order) (
 
 func (r *orderRepository) GetByID(id string) (*canonical.Order, error) {
 	orderRows, err := r.db.Query(
-		"SELECT * FROM Order WHERE ID = ?",
+		"SELECT * FROM \"Order\" WHERE ID = ?",
 		id,
 	)
 	if err != nil {
@@ -155,7 +155,7 @@ func (r *orderRepository) GetByID(id string) (*canonical.Order, error) {
 
 func (r *orderRepository) GetByStatus(status string) ([]canonical.Order, error) {
 	orderRows, err := r.db.Query(
-		"SELECT * FROM Order WHERE Status = ?",
+		"SELECT * FROM \"Order\" WHERE Status = ?",
 		status,
 	)
 	if err != nil {
@@ -211,7 +211,7 @@ func (r *orderRepository) GetByStatus(status string) ([]canonical.Order, error) 
 }
 
 func (r *orderRepository) CheckoutOrder(orderID string, payment canonical.Payment) error {
-	sqlStatement := "INSERT INTO Order (ID, PaymentType, CreatedAt) VALUES ($1, $2, $3)"
+	sqlStatement := "INSERT INTO \"Order\" (ID, PaymentType, CreatedAt) VALUES ($1, $2, $3)"
 
 	_, err := r.db.Exec(sqlStatement, payment.ID, payment.PaymentType, payment.CreatedAt)
 	if err != nil {
