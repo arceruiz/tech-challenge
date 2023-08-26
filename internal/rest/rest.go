@@ -33,14 +33,14 @@ func (r rest) Start() error {
 	mainGroup := router.Group("/api")
 
 	customerGroup := mainGroup.Group("/user")
-	r.customer.Register(customerGroup)
+	r.customer.RegisterGroup(customerGroup)
 
 	productGroup := mainGroup.Group("/product")
-	r.product.Register(productGroup)
+	r.product.RegisterGroup(productGroup)
 	productGroup.Use(middlewares.Authorization)
 
 	orderGroup := mainGroup.Group("/order")
-	r.order.Register(orderGroup)
+	r.order.RegisterGroup(orderGroup)
 	productGroup.Use(middlewares.Authorization)
 
 	return router.Start(":" + cfg.Server.Port)

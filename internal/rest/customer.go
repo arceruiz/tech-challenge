@@ -12,7 +12,7 @@ import (
 )
 
 type Customer interface {
-	Register(g *echo.Group)
+	RegisterGroup(g *echo.Group)
 	Create(c echo.Context) error
 	Login(c echo.Context) error
 }
@@ -27,7 +27,7 @@ func NewCustomerChannel() Customer {
 	}
 }
 
-func (u *customer) Register(g *echo.Group) {
+func (u *customer) RegisterGroup(g *echo.Group) {
 	g.POST("/create", u.Create)
 	g.POST("/login", u.Login)
 	g.POST("/bypass", u.Bypass)

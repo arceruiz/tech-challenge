@@ -10,7 +10,7 @@ import (
 )
 
 type Product interface {
-	Register(g *echo.Group)
+	RegisterGroup(g *echo.Group)
 	Get(c echo.Context) error
 	Add(c echo.Context) error
 	Update(c echo.Context) error
@@ -27,7 +27,7 @@ func NewProductChannel() Product {
 	}
 }
 
-func (p *product) Register(g *echo.Group) {
+func (p *product) RegisterGroup(g *echo.Group) {
 	indexPath := ""
 	g.GET(indexPath, p.Get)
 	g.POST(indexPath, p.Add)

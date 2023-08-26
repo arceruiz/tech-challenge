@@ -9,7 +9,7 @@ import (
 )
 
 type Order interface {
-	Register(g *echo.Group)
+	RegisterGroup(g *echo.Group)
 	Get(c echo.Context) error
 	CheckoutOrder(c echo.Context) error
 }
@@ -24,7 +24,7 @@ func NewOrderChannel() Order {
 	}
 }
 
-func (p *order) Register(g *echo.Group) {
+func (p *order) RegisterGroup(g *echo.Group) {
 	indexPath := ""
 	g.GET(indexPath, p.Get)
 	g.POST(indexPath+"/checkout", p.CheckoutOrder)
