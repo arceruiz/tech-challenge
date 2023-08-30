@@ -211,7 +211,7 @@ func (r *orderRepository) GetByStatus(status string) ([]canonical.Order, error) 
 }
 
 func (r *orderRepository) CheckoutOrder(orderID string, payment canonical.Payment) error {
-	sqlStatement := "INSERT INTO \"Order\" (ID, PaymentType, CreatedAt) VALUES ($1, $2, $3)"
+	sqlStatement := "INSERT INTO \"Payment\" (ID, PaymentType, CreatedAt) VALUES ($1, $2, $3)"
 
 	_, err := r.db.Exec(sqlStatement, payment.ID, payment.PaymentType, payment.CreatedAt)
 	if err != nil {

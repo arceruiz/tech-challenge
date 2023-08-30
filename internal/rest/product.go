@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"tech-challenge/internal/canonical"
 	"tech-challenge/internal/service"
 
 	"net/http"
@@ -38,13 +37,14 @@ func (p *product) RegisterGroup(g *echo.Group) {
 func (p *product) Get(c echo.Context) error {
 	productID := c.QueryParam("id")
 	category := c.QueryParam("category")
+	var response []ProductResponse
 
 	if productID != "" {
 		product, err := p.service.GetByID(productID)
 		if err != nil {
 			return c.JSON(http.StatusNotFound, "Product not found")
 		}
-		return c.JSON(http.StatusOK, product)
+		return c.JSON(http.StatusOK, productToResponse(*product))
 	}
 
 	if category != "" {
@@ -52,24 +52,33 @@ func (p *product) Get(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		return c.JSON(http.StatusOK, products)
+
+		for _, product := range products {
+			response = append(response, productToResponse(product))
+		}
+		return c.JSON(http.StatusOK, response)
 	}
 
 	products, err := p.service.GetProducts()
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, products)
+
+	for _, product := range products {
+		response = append(response, productToResponse(product))
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (p *product) Add(c echo.Context) error {
-	var newProduct canonical.Product
+	var newProduct ProductRequest
 	err := c.Bind(&newProduct)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	err = p.service.CreateProduct(newProduct)
+	err = p.service.CreateProduct(newProduct.toCanonical())
 	if err != nil {
 		return err
 	}
@@ -80,13 +89,13 @@ func (p *product) Add(c echo.Context) error {
 func (p *product) Update(c echo.Context) error {
 	productID := c.Param("id")
 
-	var updatedProduct canonical.Product
+	var updatedProduct ProductRequest
 	err := c.Bind(&updatedProduct)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	err = p.service.UpdateProduct(productID, updatedProduct)
+	err = p.service.UpdateProduct(productID, updatedProduct.toCanonical())
 	if err != nil {
 		return c.JSON(http.StatusNotFound, "Product not found")
 	}

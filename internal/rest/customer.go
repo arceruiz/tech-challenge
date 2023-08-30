@@ -2,11 +2,9 @@ package rest
 
 import (
 	"fmt"
-	"tech-challenge/internal/canonical"
 	"tech-challenge/internal/service"
 
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo"
 )
@@ -42,13 +40,7 @@ func (u *customer) Create(c echo.Context) error {
 		})
 	}
 
-	customer, err := u.service.Create(canonical.Customer{
-		Document:  customerRequest.Document,
-		Email:     customerRequest.Email,
-		Name:      customerRequest.Name,
-		Password:  customerRequest.Password,
-		CreatedAt: time.Now().Format(time.RFC822Z),
-	})
+	customer, err := u.service.Create(customerRequest.toCanonical())
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Response{
@@ -56,12 +48,7 @@ func (u *customer) Create(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, CustomerResponse{
-		ID:       customer.Id,
-		Name:     customer.Name,
-		Document: customer.Document,
-		Email:    customer.Email,
-	})
+	return c.JSON(http.StatusOK, customerToResponse(*customer))
 }
 
 func (u *customer) Login(c echo.Context) error {
@@ -73,10 +60,7 @@ func (u *customer) Login(c echo.Context) error {
 		})
 	}
 
-	token, err := u.service.Login(canonical.Customer{
-		Email:    customerLogin.Email,
-		Password: customerLogin.Password,
-	})
+	token, err := u.service.Login(customerLogin.toCanonical())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Response{err.Error()})
 	}

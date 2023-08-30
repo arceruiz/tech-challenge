@@ -4,6 +4,7 @@ import (
 	"tech-challenge/internal/auth/token"
 	"tech-challenge/internal/canonical"
 	"tech-challenge/internal/repository"
+	"time"
 
 	"fmt"
 	"tech-challenge/internal/security"
@@ -29,6 +30,9 @@ func NewCustomerService() CustomerService {
 }
 
 func (u *customerService) Create(customer canonical.Customer) (*canonical.Customer, error) {
+	CreatedAt := time.Now().Format(time.RFC822Z)
+	customer.CreatedAt = CreatedAt
+
 	passEncrypted, err := security.Hash(customer.Password)
 	if err != nil {
 		err = fmt.Errorf("error generating password hash: %w", err)
