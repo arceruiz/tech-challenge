@@ -3,5 +3,5 @@ token:
 server:
   port: 3001
 db:
-  connectionString: host=postgres port=5432 dbname=fiap_tech_challenge user=postgres password=1234 sslmode=disable
+  connectionString: host=172.19.0.1 port=5432 dbname=fiap_tech_challenge user=postgres password=1234 sslmode=disable
   

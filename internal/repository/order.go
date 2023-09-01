@@ -1,31 +1,34 @@
 package repository
 
 import (
-	"database/sql"
-	"strconv"
+	"context"
 	"tech-challenge/internal/canonical"
+
+	"github.com/jackc/pgx/v4"
 )
 
 type OrderRepository interface {
-	GetOrders() ([]canonical.Order, error)
-	CreateOrder(order canonical.Order) error
-	UpdateOrder(id string, updatedOrder canonical.Order) (canonical.Order, error)
-	GetByID(id string) (*canonical.Order, error)
-	GetByStatus(status string) ([]canonical.Order, error)
-	CheckoutOrder(orderID string, payment canonical.Payment) error
+	GetOrders(context.Context) ([]canonical.Order, error)
+	CreateOrder(context.Context, canonical.Order) (int, error)
+	UpdateOrder(context.Context, string, canonical.Order) (canonical.Order, error)
+	GetByID(context.Context, string) (*canonical.Order, error)
+	GetByStatus(context.Context, string) ([]canonical.Order, error)
+	CheckoutOrder(context.Context, string, canonical.Payment) error
 }
 
 type orderRepository struct {
-	db *sql.DB
+	db *pgx.Conn
 }
 
 func NewOrderRepo() OrderRepository {
 	return &orderRepository{New()}
 }
 
-func (r *orderRepository) GetOrders() ([]canonical.Order, error) {
-	orderRows, err := r.db.Query(
-		"SELECT * FROM \"Order\"",
+func (r *orderRepository) GetOrders(ctx context.Context) ([]canonical.Order, error) {
+	sqlStatement := "SELECT * FROM \"Order\""
+
+	orderRows, err := r.db.Query(ctx,
+		sqlStatement,
 	)
 	if err != nil {
 		return nil, err
@@ -47,71 +50,56 @@ func (r *orderRepository) GetOrders() ([]canonical.Order, error) {
 		); err != nil {
 			return nil, err
 		}
-		orderItems, err := r.GetOrderItemsFromOrderID(order.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		productRepo := NewProductRepo()
-		var cannonOrderItems []canonical.OrderItem
-		for _, orderItem := range orderItems {
-			product, err := productRepo.GetByID(orderItem.ProductID)
-			if err != nil {
-				return nil, err
-			}
-
-			qty, err := strconv.Atoi(orderItem.Quantity)
-			if err != nil {
-				return nil, err
-			}
-
-			cannonOrderItems = append(cannonOrderItems, canonical.OrderItem{
-				Product:  *product,
-				Quantity: qty,
-			})
-		}
-
-		order.OrderItems = cannonOrderItems
-
 		orders = append(orders, order)
 	}
 
 	return orders, nil
 }
 
-func (r *orderRepository) CreateOrder(order canonical.Order) error {
-	sqlStatement := "INSERT INTO \"Order\" (ID, CustomerID, PaymentID, Status , CreatedAt , UpdatedAt , Total) VALUES ($1, $2, $3, $4, $5, $6, $7)"
+func (r *orderRepository) CreateOrder(ctx context.Context, order canonical.Order) (int, error) {
+	sqlStatementOrder := "INSERT INTO \"Order\" (CustomerID, PaymentID, Status, CreatedAt, UpdatedAt, Total) VALUES ($1, $2, $3, $4, $5, $6) RETURNING ID"
 
-	_, err := r.db.Exec(sqlStatement, order.ID, order.CustomerID, order.PaymentID, order.Status, order.CreatedAt, order.UpdatedAt, order.Total)
+	var insertedId int
+
+	err := r.db.QueryRow(ctx, sqlStatementOrder, order.CustomerID, order.PaymentID, order.Status, order.CreatedAt, order.UpdatedAt, order.Total).Scan(&insertedId)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	for _, orderItem := range order.OrderItems {
-		err := r.CreateOrderItem(orderItem, order.ID)
-		if err != nil {
-			return err
+
+	if len(order.OrderItems) > 0 {
+		sqlStatementOrderProduct := "INSERT INTO \"Order_Items\" (OrderID, ProductId, Quantity) VALUES ($1, $2, $3)"
+
+		for _, product := range order.OrderItems {
+			_, err = r.db.Exec(ctx, sqlStatementOrderProduct, insertedId, product.ID, product.Quantity)
+			if err != nil {
+				return 0, err
+			}
 		}
 	}
-	return nil
+
+	return insertedId, nil
 }
 
-func (r *orderRepository) UpdateOrder(id string, updatedOrder canonical.Order) (canonical.Order, error) {
+func (r *orderRepository) UpdateOrder(ctx context.Context, id string, updatedOrder canonical.Order) (canonical.Order, error) {
 	return canonical.Order{}, nil
 }
 
-func (r *orderRepository) GetByID(id string) (*canonical.Order, error) {
-	orderRows, err := r.db.Query(
-		"SELECT * FROM \"Order\" WHERE ID = ?",
-		id,
-	)
+func (r *orderRepository) GetByID(ctx context.Context, id string) (*canonical.Order, error) {
+	var order canonical.Order
+	var batch pgx.Batch
+
+	batch.Queue(`SELECT * FROM "Order" o WHERE o.ID = $1;`, id)
+	batch.Queue(`SELECT p.id, p.name, p.description, p.price, p.category, p.status, p.imagepath, oi.quantity FROM "Order_Items" oi JOIN "Product" p ON p.ID = oi.productid WHERE oi.orderid = $1;`, id)
+
+	results := r.db.SendBatch(context.Background(), &batch)
+
+	orderRow, err := results.Query()
 	if err != nil {
 		return nil, err
 	}
-	defer orderRows.Close()
 
-	var order *canonical.Order
-	if orderRows.Next() {
-		if err = orderRows.Scan(
+	if orderRow.Next() {
+		err = orderRow.Scan(
 			&order.ID,
 			&order.CustomerID,
 			&order.PaymentID,
@@ -119,44 +107,50 @@ func (r *orderRepository) GetByID(id string) (*canonical.Order, error) {
 			&order.CreatedAt,
 			&order.UpdatedAt,
 			&order.Total,
-		); err != nil {
+		)
+		if err != nil {
 			return nil, err
 		}
-		orderItems, err := r.GetOrderItemsFromOrderID(order.ID)
+	}
+	orderRow.Close()
+
+	productsRows, err := results.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer productsRows.Close()
+
+	var items []canonical.OrderItem
+
+	for productsRows.Next() {
+		var item canonical.OrderItem
+
+		err = productsRows.Scan(
+			&item.ID,
+			&item.Name,
+			&item.Description,
+			&item.Price,
+			&item.Category,
+			&item.Status,
+			&item.ImagePath,
+			&item.Quantity,
+		)
 		if err != nil {
 			return nil, err
 		}
 
-		productRepo := NewProductRepo()
-		var cannonOrderItems []canonical.OrderItem
-		for _, orderItem := range orderItems {
-			product, err := productRepo.GetByID(orderItem.ProductID)
-			if err != nil {
-				return nil, err
-			}
-
-			qty, err := strconv.Atoi(orderItem.Quantity)
-			if err != nil {
-				return nil, err
-			}
-
-			cannonOrderItems = append(cannonOrderItems, canonical.OrderItem{
-				Product:  *product,
-				Quantity: qty,
-			})
-		}
-
-		order.OrderItems = cannonOrderItems
-
+		items = append(items, item)
 	}
 
-	return order, nil
+	order.OrderItems = items
+	return &order, nil
 }
 
-func (r *orderRepository) GetByStatus(status string) ([]canonical.Order, error) {
-	orderRows, err := r.db.Query(
-		"SELECT * FROM \"Order\" WHERE Status = ?",
-		status,
+func (r *orderRepository) GetByStatus(ctx context.Context, status string) ([]canonical.Order, error) {
+	sqlStatement := "SELECT * FROM \"Order\" WHERE status = $1"
+
+	orderRows, err := r.db.Query(context.Background(),
+		sqlStatement,
 	)
 	if err != nil {
 		return nil, err
@@ -178,42 +172,16 @@ func (r *orderRepository) GetByStatus(status string) ([]canonical.Order, error) 
 		); err != nil {
 			return nil, err
 		}
-		orderItems, err := r.GetOrderItemsFromOrderID(order.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		productRepo := NewProductRepo()
-		var cannonOrderItems []canonical.OrderItem
-		for _, orderItem := range orderItems {
-			product, err := productRepo.GetByID(orderItem.ProductID)
-			if err != nil {
-				return nil, err
-			}
-
-			qty, err := strconv.Atoi(orderItem.Quantity)
-			if err != nil {
-				return nil, err
-			}
-
-			cannonOrderItems = append(cannonOrderItems, canonical.OrderItem{
-				Product:  *product,
-				Quantity: qty,
-			})
-		}
-
-		order.OrderItems = cannonOrderItems
-
 		orders = append(orders, order)
 	}
 
 	return orders, nil
 }
 
-func (r *orderRepository) CheckoutOrder(orderID string, payment canonical.Payment) error {
+func (r *orderRepository) CheckoutOrder(ctx context.Context, orderID string, payment canonical.Payment) error {
 	sqlStatement := "INSERT INTO \"Payment\" (ID, PaymentType, CreatedAt) VALUES ($1, $2, $3)"
 
-	_, err := r.db.Exec(sqlStatement, payment.ID, payment.PaymentType, payment.CreatedAt)
+	_, err := r.db.Exec(ctx, sqlStatement, payment.ID, payment.PaymentType, payment.CreatedAt)
 	if err != nil {
 		return err
 	}

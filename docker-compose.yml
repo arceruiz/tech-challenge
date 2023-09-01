@@ -1,6 +1,5 @@
 version: '3'
 services:
-
   postgres:
     image: postgres:latest
     volumes:
@@ -10,16 +9,4 @@ services:
     environment:
       POSTGRES_DB: "fiap_tech_challenge"
       POSTGRES_PASSWORD: "1234"
-    networks:
-      - tech-challenge-nw
-
-  tech-challenge-fase-1:
-    image: tech-challenge
-    ports:
-      - "3001:3001"
-    networks:
-      - tech-challenge-nw
-
-networks:
-  tech-challenge-nw:
-    driver: bridge
+      POSTGRES_USER: "postgres"

@@ -1,19 +1,21 @@
 package service
 
 import (
+	"context"
 	"tech-challenge/internal/canonical"
 	"tech-challenge/internal/repository"
+	"time"
 
-	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type OrderService interface {
-	GetOrders() ([]canonical.Order, error)
-	CreateOrder(order canonical.Order) error
-	UpdateOrder(id string, updatedOrder canonical.Order) (canonical.Order, error)
-	GetByID(id string) (*canonical.Order, error)
-	GetByStatus(id string) ([]canonical.Order, error)
-	CheckoutOrder(orderID string, payment canonical.Payment) error
+	GetOrders(context.Context) ([]canonical.Order, error)
+	CreateOrder(context.Context, canonical.Order) (int, error)
+	UpdateOrder(context.Context, string, canonical.Order) (canonical.Order, error)
+	GetByID(context.Context, string) (*canonical.Order, error)
+	GetByStatus(context.Context, string) ([]canonical.Order, error)
+	CheckoutOrder(context.Context, string, canonical.Payment) error
 }
 
 type orderService struct {
@@ -26,32 +28,45 @@ func NewOrderService() OrderService {
 	}
 }
 
-func (s *orderService) GetOrders() ([]canonical.Order, error) {
-	return s.repo.GetOrders()
+func (s *orderService) GetOrders(ctx context.Context) ([]canonical.Order, error) {
+	return s.repo.GetOrders(ctx)
 }
 
-func (s *orderService) CreateOrder(order canonical.Order) error {
-	order.ID = uuid.NewString()
-	return s.repo.CreateOrder(order)
+func (s *orderService) CreateOrder(ctx context.Context, order canonical.Order) (int, error) {
+	timeNow := time.Now()
+	order.CreatedAt = &timeNow
+	s.calculateTotal(&order)
+
+	return s.repo.CreateOrder(ctx, order)
 }
 
-func (s *orderService) UpdateOrder(id string, updatedOrder canonical.Order) (canonical.Order, error) {
-	return s.repo.UpdateOrder(id, updatedOrder)
+func (s *orderService) UpdateOrder(ctx context.Context, id string, updatedOrder canonical.Order) (canonical.Order, error) {
+	return s.repo.UpdateOrder(ctx, id, updatedOrder)
 }
 
-func (s *orderService) GetByID(id string) (*canonical.Order, error) {
-	return s.repo.GetByID(id)
+func (s *orderService) GetByID(ctx context.Context, id string) (*canonical.Order, error) {
+	return s.repo.GetByID(ctx, id)
 }
 
-func (s *orderService) GetByStatus(id string) ([]canonical.Order, error) {
-	return s.repo.GetByStatus(id)
+func (s *orderService) GetByStatus(ctx context.Context, id string) ([]canonical.Order, error) {
+	return s.repo.GetByStatus(ctx, id)
 }
 
-func (s *orderService) CheckoutOrder(orderID string, payment canonical.Payment) error {
-	err := s.repo.CheckoutOrder(orderID, payment)
+func (s *orderService) CheckoutOrder(ctx context.Context, orderID string, payment canonical.Payment) error {
+	err := s.repo.CheckoutOrder(ctx, orderID, payment)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *orderService) calculateTotal(order *canonical.Order) {
+	for _, product := range order.OrderItems {
+		price := decimal.NewFromFloat(product.Price)
+		quantity := decimal.NewFromInt(product.Quantity)
+		productTotal, _ := price.Mul(quantity).Float64()
+
+		order.Total += productTotal
+	}
 }

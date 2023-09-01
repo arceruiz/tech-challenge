@@ -1,11 +1,12 @@
 package repository
 
 import (
-	"database/sql"
+	"context"
 	"errors"
 	"tech-challenge/internal/config"
 
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v4"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,8 +15,8 @@ var (
 	ErrorNotFound = errors.New("entity not found")
 )
 
-func New() *sql.DB {
-	db, err := sql.Open("postgres", cfg.DB.ConnectionString)
+func New() *pgx.Conn {
+	db, err := pgx.Connect(context.Background(), cfg.DB.ConnectionString)
 	if err != nil {
 		logrus.Fatal(err)
 	}

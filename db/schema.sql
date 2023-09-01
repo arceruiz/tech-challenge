@@ -1,46 +1,46 @@
 CREATE TABLE "Customer" (
-  ID VARCHAR(255) PRIMARY KEY,
+  ID SERIAL PRIMARY KEY,
   Name VARCHAR(255),
   Email VARCHAR(255),
   Document VARCHAR(255),
   Password VARCHAR(255),
-  CreatedAt VARCHAR(255)
+  CreatedAt TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE "Product" (
-  ID VARCHAR(255) PRIMARY KEY,
+  ID SERIAL PRIMARY KEY,
   Name VARCHAR(255),
-  Description VARCHAR(255),
-  Price DECIMAL,
+  Description VARCHAR(500),
+  Price DECIMAL(16, 6),
   Category VARCHAR(255),
-  Status VARCHAR(255),
+  Status INT,
   Imagepath VARCHAR(255)
 );
 
 CREATE TABLE "Payment" (
-  ID VARCHAR(255) PRIMARY KEY,
-  PaymentType VARCHAR(255),
-  CreatedAt VARCHAR(255)
+  ID SERIAL PRIMARY KEY,
+  PaymentType INT,
+  CreatedAt TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE "Order" (
-  ID VARCHAR(255) PRIMARY KEY,
-  CustomerID VARCHAR(255) REFERENCES "Customer"(ID),
-  PaymentID VARCHAR(255) REFERENCES "Payment"(ID),
-  Status VARCHAR(255),
-  CreatedAt VARCHAR(255),
-  UpdatedAt VARCHAR(255),
-  Total VARCHAR(255)
+  ID SERIAL PRIMARY KEY,
+  CustomerID INT REFERENCES "Customer"(ID),
+  PaymentID INT REFERENCES "Payment"(ID),
+  Status INT,
+  CreatedAt TIMESTAMP WITH TIME ZONE,
+  UpdatedAt TIMESTAMP WITH TIME ZONE,
+  Total DECIMAL(16, 6)
 );
 
 CREATE TABLE "Order_Items" (
-  ID VARCHAR(255) PRIMARY KEY,
-  OrderID VARCHAR(255) REFERENCES "Order"(ID),
-  ProductID VARCHAR(255) REFERENCES "Product"(ID),
-  Quantity VARCHAR(255)
+  OrderID INT REFERENCES "Order"(ID),
+  ProductID INT REFERENCES "Product"(ID),
+  Quantity INT 
 );
 
 ALTER TABLE "Order_Items"
+ADD PRIMARY KEY (OrderID, ProductID),
 ADD CONSTRAINT order_items_order_fk FOREIGN KEY (OrderID) REFERENCES "Order" (ID),
 ADD CONSTRAINT order_items_product_fk FOREIGN KEY (ProductID) REFERENCES "Product" (ID);
 

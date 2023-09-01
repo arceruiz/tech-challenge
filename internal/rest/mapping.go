@@ -4,6 +4,7 @@ import "tech-challenge/internal/canonical"
 
 func (p *ProductRequest) toCanonical() canonical.Product {
 	return canonical.Product{
+		ID:          p.ID,
 		Name:        p.Name,
 		Description: p.Description,
 		Price:       p.Price,

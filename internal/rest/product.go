@@ -40,7 +40,7 @@ func (p *product) Get(c echo.Context) error {
 	var response []ProductResponse
 
 	if productID != "" {
-		product, err := p.service.GetByID(productID)
+		product, err := p.service.GetByID(c.Request().Context(), productID)
 		if err != nil {
 			return c.JSON(http.StatusNotFound, "Product not found")
 		}
@@ -48,7 +48,7 @@ func (p *product) Get(c echo.Context) error {
 	}
 
 	if category != "" {
-		products, err := p.service.GetByCategory(category)
+		products, err := p.service.GetByCategory(c.Request().Context(), category)
 		if err != nil {
 			return err
 		}
@@ -59,7 +59,7 @@ func (p *product) Get(c echo.Context) error {
 		return c.JSON(http.StatusOK, response)
 	}
 
-	products, err := p.service.GetProducts()
+	products, err := p.service.GetProducts(c.Request().Context())
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (p *product) Add(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	err = p.service.CreateProduct(newProduct.toCanonical())
+	err = p.service.CreateProduct(c.Request().Context(), newProduct.toCanonical())
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func (p *product) Update(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	err = p.service.UpdateProduct(productID, updatedProduct.toCanonical())
+	err = p.service.UpdateProduct(c.Request().Context(), productID, updatedProduct.toCanonical())
 	if err != nil {
 		return c.JSON(http.StatusNotFound, "Product not found")
 	}
@@ -106,7 +106,7 @@ func (p *product) Update(c echo.Context) error {
 func (p *product) Remove(c echo.Context) error {
 	productID := c.Param("id")
 
-	err := p.service.Remove(productID)
+	err := p.service.Remove(c.Request().Context(), productID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, "Product not found")
 	}

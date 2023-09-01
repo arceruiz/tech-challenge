@@ -1,9 +1,8 @@
 ### Mauricio:
-5. Create repository entities to fit ERM
+1. Order total field should be calculated in service OK
 1. Create secret to resolve db connection and jwt secret
-3. Expose endpoint to create orders
-1. Order total field should be calculated in service
-1. Order checkout, should receive ordered products and return order identification;
+3. Expose endpoint to create orders OK 
+1. Order checkout, should receive ordered products and return order identification; OK
 2. Event storm's diagram
 1. EXTRA CHALLENGE: implement Mercado Pago integration generating QR Code and add webhook to recieve payments.
 

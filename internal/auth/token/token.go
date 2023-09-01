@@ -15,10 +15,10 @@ var (
 	cfg = &config.Cfg
 )
 
-func GenerateToken(userId string) (string, error) {
+func GenerateToken(userId int) (string, error) {
 	permissions := jwt.MapClaims{}
 
-	if userId == "guest" {
+	if userId == 1 {
 		permissions["guest"] = true
 	}
 	permissions["authorized"] = true

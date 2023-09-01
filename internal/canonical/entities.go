@@ -1,42 +1,44 @@
 package canonical
 
+import "time"
+
 type Customer struct {
-	Id        string
+	Id        int
 	Document  string
 	Name      string
 	Email     string
 	Password  string
-	CreatedAt string
+	CreatedAt *time.Time
 }
 
 type Product struct {
-	ID          string
+	ID          int
 	Name        string
 	Description string
-	Price       string
+	Price       float64
 	Category    string
-	Status      string
+	Status      int
 	ImagePath   string
 }
 
 type Order struct {
-	ID         string
-	CustomerID string
-	PaymentID  string
-	Status     string
-	CreatedAt  string
-	UpdatedAt  string
-	Total      string
-	OrderItems []OrderItem
+	ID         int
+	CustomerID int
+	PaymentID  int
+	Status     int
+	CreatedAt  *time.Time
+	UpdatedAt  *time.Time
+	Total      float64
+	OrderItems []OrderItem //orderProduct
 }
 
 type OrderItem struct {
-	Product  Product
-	Quantity int
+	Product
+	Quantity int64
 }
 
 type Payment struct {
-	ID          string
-	PaymentType string
-	CreatedAt   string
+	ID          int
+	PaymentType int
+	CreatedAt   *time.Time
 }

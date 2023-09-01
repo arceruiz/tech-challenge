@@ -1,28 +1,30 @@
 package repository
 
 import (
-	"database/sql"
+	"context"
 	"tech-challenge/internal/canonical"
+
+	"github.com/jackc/pgx/v4"
 )
 
 type ProductRepository interface {
-	GetProducts() ([]canonical.Product, error)
-	CreateProduct(product canonical.Product) error
-	UpdateProduct(id string, product canonical.Product) error
-	GetByID(id string) (*canonical.Product, error)
-	GetByCategory(id string) ([]canonical.Product, error)
+	GetProducts(context.Context) ([]canonical.Product, error)
+	CreateProduct(context.Context, canonical.Product) error
+	UpdateProduct(context.Context, string, canonical.Product) error
+	GetByID(context.Context, string) (*canonical.Product, error)
+	GetByCategory(context.Context, string) ([]canonical.Product, error)
 }
 
 type productRepository struct {
-	db *sql.DB
+	db *pgx.Conn
 }
 
 func NewProductRepo() ProductRepository {
 	return &productRepository{New()}
 }
 
-func (r *productRepository) GetProducts() ([]canonical.Product, error) {
-	rows, err := r.db.Query(
+func (r *productRepository) GetProducts(ctx context.Context) ([]canonical.Product, error) {
+	rows, err := r.db.Query(context.Background(),
 		"SELECT * FROM \"Product\" WHERE Status = 'ACTIVE'",
 	)
 	if err != nil {
@@ -51,28 +53,28 @@ func (r *productRepository) GetProducts() ([]canonical.Product, error) {
 	return products, nil
 }
 
-func (r *productRepository) CreateProduct(product canonical.Product) error {
+func (r *productRepository) CreateProduct(ctx context.Context, product canonical.Product) error {
 	sqlStatement := "INSERT INTO \"Product\" (ID, Name, Description, Price, Category, Status, Imagepath) VALUES ($1, $2, $3, $4, $5, $6, $7)"
 
-	_, err := r.db.Exec(sqlStatement, product.ID, product.Name, product.Description, product.Price, product.Category, product.Status, product.ImagePath)
+	_, err := r.db.Exec(context.Background(), sqlStatement, product.ID, product.Name, product.Description, product.Price, product.Category, product.Status, product.ImagePath)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *productRepository) UpdateProduct(id string, product canonical.Product) error {
+func (r *productRepository) UpdateProduct(ctx context.Context, id string, product canonical.Product) error {
 	sqlStatement := "UPDATE \"Product\" SET Name = ?, Description = ?, Price = ?, Category = ?, Status = ?, Imagepath = ? WHERE ID = ?"
 
-	_, err := r.db.Exec(sqlStatement, product.Name, product.Description, product.Price, product.Category, product.Status, product.ImagePath, id)
+	_, err := r.db.Exec(context.Background(), sqlStatement, product.Name, product.Description, product.Price, product.Category, product.Status, product.ImagePath, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *productRepository) GetByID(id string) (*canonical.Product, error) {
-	rows, err := r.db.Query(
+func (r *productRepository) GetByID(ctx context.Context, id string) (*canonical.Product, error) {
+	rows, err := r.db.Query(context.Background(),
 		"SELECT * FROM \"Product\" WHERE ID = $1",
 		id,
 	)
@@ -100,8 +102,8 @@ func (r *productRepository) GetByID(id string) (*canonical.Product, error) {
 	return nil, ErrorNotFound
 }
 
-func (r *productRepository) GetByCategory(Category string) ([]canonical.Product, error) {
-	rows, err := r.db.Query(
+func (r *productRepository) GetByCategory(ctx context.Context, Category string) ([]canonical.Product, error) {
+	rows, err := r.db.Query(context.Background(),
 		"SELECT * FROM \"Product\" WHERE Category = $1",
 		Category,
 	)
