@@ -24,7 +24,7 @@ func NewProductRepo() ProductRepository {
 }
 
 func (r *productRepository) GetProducts(ctx context.Context) ([]canonical.Product, error) {
-	rows, err := r.db.Query(context.Background(),
+	rows, err := r.db.Query(ctx,
 		"SELECT * FROM \"Product\" WHERE Status = 'ACTIVE'",
 	)
 	if err != nil {
@@ -56,7 +56,7 @@ func (r *productRepository) GetProducts(ctx context.Context) ([]canonical.Produc
 func (r *productRepository) CreateProduct(ctx context.Context, product canonical.Product) error {
 	sqlStatement := "INSERT INTO \"Product\" (ID, Name, Description, Price, Category, Status, Imagepath) VALUES ($1, $2, $3, $4, $5, $6, $7)"
 
-	_, err := r.db.Exec(context.Background(), sqlStatement, product.ID, product.Name, product.Description, product.Price, product.Category, product.Status, product.ImagePath)
+	_, err := r.db.Exec(ctx, sqlStatement, product.ID, product.Name, product.Description, product.Price, product.Category, product.Status, product.ImagePath)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (r *productRepository) CreateProduct(ctx context.Context, product canonical
 func (r *productRepository) UpdateProduct(ctx context.Context, id string, product canonical.Product) error {
 	sqlStatement := "UPDATE \"Product\" SET Name = ?, Description = ?, Price = ?, Category = ?, Status = ?, Imagepath = ? WHERE ID = ?"
 
-	_, err := r.db.Exec(context.Background(), sqlStatement, product.Name, product.Description, product.Price, product.Category, product.Status, product.ImagePath, id)
+	_, err := r.db.Exec(ctx, sqlStatement, product.Name, product.Description, product.Price, product.Category, product.Status, product.ImagePath, id)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func (r *productRepository) UpdateProduct(ctx context.Context, id string, produc
 }
 
 func (r *productRepository) GetByID(ctx context.Context, id string) (*canonical.Product, error) {
-	rows, err := r.db.Query(context.Background(),
+	rows, err := r.db.Query(ctx,
 		"SELECT * FROM \"Product\" WHERE ID = $1",
 		id,
 	)
@@ -103,7 +103,7 @@ func (r *productRepository) GetByID(ctx context.Context, id string) (*canonical.
 }
 
 func (r *productRepository) GetByCategory(ctx context.Context, Category string) ([]canonical.Product, error) {
-	rows, err := r.db.Query(context.Background(),
+	rows, err := r.db.Query(ctx,
 		"SELECT * FROM \"Product\" WHERE Category = $1",
 		Category,
 	)

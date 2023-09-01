@@ -1,7 +1,2 @@
-token:
-  key: vuIXaOK4OpJWA9ySX1UTpIWshXPpP6neGKGA724FauY
 server:
   port: 3001
-db:
-  connectionString: host=172.19.0.1 port=5432 dbname=fiap_tech_challenge user=postgres password=1234 sslmode=disable
-  

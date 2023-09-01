@@ -91,7 +91,7 @@ func (r *orderRepository) GetByID(ctx context.Context, id string) (*canonical.Or
 	batch.Queue(`SELECT * FROM "Order" o WHERE o.ID = $1;`, id)
 	batch.Queue(`SELECT p.id, p.name, p.description, p.price, p.category, p.status, p.imagepath, oi.quantity FROM "Order_Items" oi JOIN "Product" p ON p.ID = oi.productid WHERE oi.orderid = $1;`, id)
 
-	results := r.db.SendBatch(context.Background(), &batch)
+	results := r.db.SendBatch(ctx, &batch)
 
 	orderRow, err := results.Query()
 	if err != nil {
@@ -149,7 +149,7 @@ func (r *orderRepository) GetByID(ctx context.Context, id string) (*canonical.Or
 func (r *orderRepository) GetByStatus(ctx context.Context, status string) ([]canonical.Order, error) {
 	sqlStatement := "SELECT * FROM \"Order\" WHERE status = $1"
 
-	orderRows, err := r.db.Query(context.Background(),
+	orderRows, err := r.db.Query(ctx,
 		sqlStatement,
 	)
 	if err != nil {

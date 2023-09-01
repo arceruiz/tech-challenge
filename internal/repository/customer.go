@@ -21,10 +21,10 @@ func NewCustomerRepo() CustomerRepository {
 }
 
 func (r *customerRepository) Create(ctx context.Context, user canonical.Customer) (int, error) {
-	sqlStatement := "INSERT INTO \"Customer\" (name, email, password, document, createdAt) VALUES ($1, $2, $3, $4, $5)"
+	sqlStatement := "INSERT INTO \"Customer\" (name, email, password, document, createdAt) VALUES ($1, $2, $3, $4, $5) RETURNING ID"
 	var insertedId int
 
-	err := r.db.QueryRow(context.Background(), sqlStatement, user.Name, user.Email, user.Password, user.Document, user.CreatedAt).Scan(&insertedId)
+	err := r.db.QueryRow(ctx, sqlStatement, user.Name, user.Email, user.Password, user.Document, user.CreatedAt).Scan(&insertedId)
 	if err != nil {
 		return 0, err
 	}
@@ -33,7 +33,7 @@ func (r *customerRepository) Create(ctx context.Context, user canonical.Customer
 }
 
 func (r *customerRepository) GetByEmail(ctx context.Context, email string) (*canonical.Customer, error) {
-	rows, err := r.db.Query(context.Background(),
+	rows, err := r.db.Query(ctx,
 		"SELECT * FROM \"Customer\" WHERE Email = $1",
 		email,
 	)
