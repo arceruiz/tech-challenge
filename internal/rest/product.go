@@ -27,7 +27,7 @@ func NewProductChannel() Product {
 }
 
 func (p *product) RegisterGroup(g *echo.Group) {
-	indexPath := ""
+	indexPath := "/"
 	g.GET(indexPath, p.Get)
 	g.POST(indexPath, p.Add)
 	g.PUT(indexPath+"/:id", p.Update)

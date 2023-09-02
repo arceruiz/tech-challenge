@@ -43,5 +43,8 @@ func (r rest) Start() error {
 	r.order.RegisterGroup(orderGroup)
 	orderGroup.Use(middlewares.Authorization)
 
+	paymentGroup := mainGroup.Group("/payment")
+	r.
+
 	return router.Start(":" + cfg.Server.Port)
 }

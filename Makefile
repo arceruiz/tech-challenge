@@ -1,5 +1,5 @@
 build:
-	docker build -t tech-challenge .
+	docker build -f build/Dockerfile -t tech-challenge .
 
 run:
-	docker-compose up -d
+	docker-compose -f deployments/docker-compose.yml up -d

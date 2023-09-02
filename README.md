@@ -1,3 +1,23 @@
+# FIAP - Tech Challenge II
+
+> **Pré-requisitos:**
+> 1. make
+> 1. docker
+
+# Como buildar:
+
+```shell
+make build
+```
+
+# Como executar:
+
+```shell
+make install
+```
+
+
+
 ### Mauricio:
 1. Order total field should be calculated in service OK
 1. Create secret to resolve db connection and jwt secret
@@ -15,3 +35,11 @@
 1. Check order payment status. It should inform payment aproval status;
 1. Application deployment containing 2+ PODs
 1. Application service load balancer with NLB or ALB type
+
+
+
+
+criei /build
+criei /deployments
+cargas .sql nao deveria estar no /assets? https://github.com/golang-standards/project-layout/tree/master/assets
+imagem ainda ta errada no docker compose, precisa usar container repo/registry

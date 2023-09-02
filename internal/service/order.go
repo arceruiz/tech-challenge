@@ -35,6 +35,7 @@ func (s *orderService) GetOrders(ctx context.Context) ([]canonical.Order, error)
 func (s *orderService) CreateOrder(ctx context.Context, order canonical.Order) (int, error) {
 	timeNow := time.Now()
 	order.CreatedAt = &timeNow
+	order.Status = canonical.ORDER_RECEIVED
 	s.calculateTotal(&order)
 
 	return s.repo.CreateOrder(ctx, order)
@@ -53,6 +54,8 @@ func (s *orderService) GetByStatus(ctx context.Context, id string) ([]canonical.
 }
 
 func (s *orderService) CheckoutOrder(ctx context.Context, orderID string, payment canonical.Payment) error {
+	order.Status = canonical.ORDER_PREPARING
+	order.UpdatedAt = time.Now()
 	err := s.repo.CheckoutOrder(ctx, orderID, payment)
 	if err != nil {
 		return err

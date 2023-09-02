@@ -25,12 +25,22 @@ type Order struct {
 	ID         int
 	CustomerID int
 	PaymentID  int
-	Status     int
+	Status     OrderStatus
 	CreatedAt  *time.Time
 	UpdatedAt  *time.Time
 	Total      float64
 	OrderItems []OrderItem //orderProduct
 }
+
+type OrderStatus int
+
+const (
+	ORDER_CANCELLED OrderStatus = 0
+	ORDER_RECEIVED OrderStatus = 1
+	ORDER_PREPARING OrderStatus = 2
+	ORDER_READY OrderStatus = 3
+	ORDER_DELIEVERED OrderStatus = 4
+)
 
 type OrderItem struct {
 	Product
@@ -42,3 +52,4 @@ type Payment struct {
 	PaymentType int
 	CreatedAt   *time.Time
 }
+

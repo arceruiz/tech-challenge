@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: fiap_tech_challenge
+            - name: POSTGRES_PASSWORD
+              value: 1234
+            - name: POSTGRES_USER
+              value: postgres
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-storage
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tech-challenge-fase-1-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tech-challenge-fase-1
+  template:
+    metadata:
+      labels:
+        app: tech-challenge-fase-1
+    spec:
+      containers:
+        - name: tech-challenge-fase-1
+          image: tech-challenge
+          ports:
+            - containerPort: 3001
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tech-challenge-fase-1-service
+spec:
+  selector:
+    app: tech-challenge-fase-1
+  ports:
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /path/to/host/directory # Replace with your host directory
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: postgres
