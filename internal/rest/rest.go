@@ -15,6 +15,7 @@ type rest struct {
 	customer Customer
 	product  Product
 	order    Order
+	payment  Payment
 }
 
 func New() rest {
@@ -44,7 +45,8 @@ func (r rest) Start() error {
 	orderGroup.Use(middlewares.Authorization)
 
 	paymentGroup := mainGroup.Group("/payment")
-	r.
+	r.payment.RegisterGroup(paymentGroup)
+	paymentGroup.Use(middlewares.Authorization)
 
 	return router.Start(":" + cfg.Server.Port)
 }

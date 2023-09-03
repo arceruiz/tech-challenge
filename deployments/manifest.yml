@@ -89,7 +89,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /path/to/host/directory # Replace with your host directory
+    path: ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
 
 ---
 apiVersion: v1
