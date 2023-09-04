@@ -21,6 +21,7 @@ CREATE TABLE "Payment" (
   ID SERIAL PRIMARY KEY,
   PaymentType INT,
   CreatedAt TIMESTAMP WITH TIME ZONE
+  Status INT,
 );
 
 CREATE TABLE "Order" (

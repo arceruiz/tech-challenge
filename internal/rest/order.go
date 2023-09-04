@@ -13,6 +13,7 @@ type Order interface {
 	RegisterGroup(g *echo.Group)
 	Get(c echo.Context) error
 	CheckoutOrder(c echo.Context) error
+	Update(c echo.Context) error
 }
 
 type order struct {
@@ -30,6 +31,7 @@ func (p *order) RegisterGroup(g *echo.Group) {
 	g.GET("/:id", p.Get)
 	g.POST("/checkout", p.CheckoutOrder)
 	g.POST("/create", p.Create)
+	g.PUT("/:id", p.Update)
 }
 
 func (p *order) GetAll(ctx echo.Context) error {
@@ -120,8 +122,38 @@ func (p *order) Create(c echo.Context) error {
 	})
 }
 
+func (p *order) Update(c echo.Context) error {
+	orderID := c.Param("id")
+	if len(orderID) == 0 {
+		return c.JSON(http.StatusBadRequest, Response{
+			Message: "missing id query param",
+		})
+	}
+
+	var orderRequest OrderRequest
+	if err := c.Bind(&orderRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, Response{
+			Message: fmt.Errorf("invalid data").Error(),
+		})
+	}
+
+	err := p.service.UpdateOrder(c.Request().Context(), orderID, orderRequest.toCanonical())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Response{
+			Message: err.Error(),
+		})
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
 func (p *order) CheckoutOrder(c echo.Context) error {
 	orderID := c.QueryParam("id")
+	if len(orderID) == 0 {
+		return c.JSON(http.StatusBadRequest, Response{
+			Message: "missing id query param",
+		})
+	}
 
 	var payment PaymentRest
 	err := c.Bind(&payment)
