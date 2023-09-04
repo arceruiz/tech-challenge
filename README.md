@@ -19,6 +19,7 @@ make install
 
 
 ### Mauricio:
+1. Ajustar implementacao do retorno de order para retornar pagamento
 1. Order total field should be calculated in service OK
 1. Create secret to resolve db connection and jwt secret
 3. Expose endpoint to create orders OK 

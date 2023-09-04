@@ -14,10 +14,10 @@ type TokenResponse struct {
 }
 
 type CustomerResponse struct {
-	ID       int    `json:"id"`
-	Document string `json:"document"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
+	ID       int    `json:"id,omitempty"`
+	Document string `json:"document,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Email    string `json:"email,omitempty"`
 }
 
 type Response struct {
@@ -25,14 +25,15 @@ type Response struct {
 }
 
 type ProductResponse struct {
-	ID          int     `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	Category    string  `json:"category"`
-	Status      int     `json:"status"`
-	ImagePath   string  `json:"imagePath"`
+	ID          int     `json:"id,omitempty"`
+	Name        string  `json:"name,omitempty"`
+	Description string  `json:"description,omitempty"`
+	Price       float64 `json:"price,omitempty"`
+	Category    string  `json:"category,omitempty"`
+	Status      int     `json:"status,omitempty"`
+	ImagePath   string  `json:"image_path,omitempty"`
 }
+
 type ProductRequest struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name"`
@@ -40,16 +41,23 @@ type ProductRequest struct {
 	Price       float64 `json:"price"`
 	Category    string  `json:"category"`
 	Status      int     `json:"status"`
-	ImagePath   string  `json:"imagePath"`
+	ImagePath   string  `json:"image_path"`
 }
 
 type OrderRequest struct {
 	CustomerID int         `json:"customer_id"`
 	PaymentID  int         `json:"payment_id"`
-	Status     int         `json:"status"`
-	CreatedAt  *time.Time  `json:"created_at"`
-	UpdatedAt  *time.Time  `json:"updated_at"`
 	OrderItems []OrderItem `json:"products"`
+}
+
+type OrderResponse struct {
+	ID           int               `json:"id,omitempty"`
+	CustomerID   int               `json:"customer_id,omitempty"`
+	Status       int               `json:"status,omitempty"`
+	CreatedAt    *time.Time        `json:"created_at,omitempty"`
+	UpdatedAt    *time.Time        `json:"updated_at,omitempty"`
+	Products     []ProductResponse `json:"products,omitempty"`
+	*PaymentRest `json:"payment,omitempty"`
 }
 
 type OrderItem struct {
@@ -57,10 +65,10 @@ type OrderItem struct {
 	Quantity int64          `json:"quantity"`
 }
 
-type PaymentRequest struct {
-	ID          int
-	PaymentType int
-	CreatedAt   *time.Time
+type PaymentRest struct {
+	ID          int        `json:"id"`
+	PaymentType int        `json:"payment_type"`
+	CreatedAt   *time.Time `json:"created_at"`
 }
 
 type PaymentCallback struct {

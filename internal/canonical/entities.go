@@ -24,7 +24,7 @@ type Product struct {
 type Order struct {
 	ID         int
 	CustomerID int
-	PaymentID  int
+	*Payment
 	Status     OrderStatus
 	CreatedAt  *time.Time
 	UpdatedAt  *time.Time
@@ -35,10 +35,10 @@ type Order struct {
 type OrderStatus int
 
 const (
-	ORDER_CANCELLED OrderStatus = 0
-	ORDER_RECEIVED OrderStatus = 1
-	ORDER_PREPARING OrderStatus = 2
-	ORDER_READY OrderStatus = 3
+	ORDER_CANCELLED  OrderStatus = 0
+	ORDER_RECEIVED   OrderStatus = 1
+	ORDER_PREPARING  OrderStatus = 2
+	ORDER_READY      OrderStatus = 3
 	ORDER_DELIEVERED OrderStatus = 4
 )
 
@@ -51,5 +51,5 @@ type Payment struct {
 	ID          int
 	PaymentType int
 	CreatedAt   *time.Time
+	Status      int
 }
-

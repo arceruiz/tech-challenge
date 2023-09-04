@@ -8,7 +8,7 @@ import (
 
 type ProductService interface {
 	GetProducts(context.Context) ([]canonical.Product, error)
-	CreateProduct(context.Context, canonical.Product) error
+	CreateProduct(context.Context, canonical.Product) (int, error)
 	UpdateProduct(context.Context, string, canonical.Product) error
 	GetByID(context.Context, string) (*canonical.Product, error)
 	GetByCategory(context.Context, string) ([]canonical.Product, error)
@@ -29,7 +29,7 @@ func (s *productService) GetProducts(ctx context.Context) ([]canonical.Product, 
 	return s.repo.GetProducts(ctx)
 }
 
-func (s *productService) CreateProduct(ctx context.Context, product canonical.Product) error {
+func (s *productService) CreateProduct(ctx context.Context, product canonical.Product) (int, error) {
 	return s.repo.CreateProduct(ctx, product)
 }
 

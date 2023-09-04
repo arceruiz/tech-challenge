@@ -4,7 +4,7 @@ import (
 	"context"
 	"tech-challenge/internal/canonical"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type CustomerRepository interface {
@@ -13,7 +13,7 @@ type CustomerRepository interface {
 }
 
 type customerRepository struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
 func NewCustomerRepo() CustomerRepository {

@@ -1,12 +1,12 @@
 package rest
 
 import (
+	"context"
 	"fmt"
 	"net/http"
-	"tech-challenge/internal/canonical"
 	"tech-challenge/internal/service"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type Order interface {
@@ -26,36 +26,76 @@ func NewOrderChannel() Order {
 }
 
 func (p *order) RegisterGroup(g *echo.Group) {
-	g.GET("/", p.Get)
+	g.GET("", p.GetAll)
+	g.GET("/:id", p.Get)
 	g.POST("/checkout", p.CheckoutOrder)
 	g.POST("/create", p.Create)
 }
 
-func (p *order) Get(c echo.Context) error {
-	orderID := c.QueryParam("id")
-	status := c.QueryParam("status")
+func (p *order) GetAll(ctx echo.Context) error {
+	status := ctx.QueryParam("status")
 
-	if orderID != "" {
-		order, err := p.service.GetByID(c.Request().Context(), orderID)
-		if err != nil {
-			return c.JSON(http.StatusNotFound, "Order not found")
-		}
-		return c.JSON(http.StatusOK, order)
-	}
-
-	if status != "" {
-		orders, err := p.service.GetByStatus(c.Request().Context(), status)
-		if err != nil {
-			return err
-		}
-		return c.JSON(http.StatusOK, orders)
-	}
-
-	orders, err := p.service.GetOrders(c.Request().Context())
+	response, err := p.get(ctx.Request().Context(), "", status)
 	if err != nil {
-		return err
+		return ctx.JSON(http.StatusInternalServerError, err)
 	}
-	return c.JSON(http.StatusOK, orders)
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (p *order) Get(ctx echo.Context) error {
+	id := ctx.Param("id")
+
+	response, err := p.get(ctx.Request().Context(), id, "")
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	if len(response) == 0 {
+		return ctx.NoContent(http.StatusNotFound)
+	}
+
+	return ctx.JSON(http.StatusOK, response[0])
+}
+
+func (p *order) get(ctx context.Context, orderID string, status string) ([]OrderResponse, error) {
+	if orderID != "" {
+		order, err := p.service.GetByID(ctx, orderID)
+		if err != nil {
+			return nil, err
+		}
+
+		if order == nil {
+			return nil, nil
+		}
+
+		return []OrderResponse{orderToResponse(*order)}, nil
+	}
+
+	var response []OrderResponse
+	if status != "" {
+		orders, err := p.service.GetByStatus(ctx, status)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, order := range orders {
+			response = append(response, orderToResponse(order))
+		}
+
+		return response, nil
+	}
+
+	orders, err := p.service.GetOrders(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, order := range orders {
+		response = append(response, orderToResponse(order))
+	}
+
+	return response, nil
 }
 
 func (p *order) Create(c echo.Context) error {
@@ -75,22 +115,23 @@ func (p *order) Create(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, id)
+	return c.JSON(http.StatusOK, OrderResponse{
+		ID: id,
+	})
 }
 
 func (p *order) CheckoutOrder(c echo.Context) error {
-	orderID := c.Param("id")
+	orderID := c.QueryParam("id")
 
-	var payment canonical.Payment
+	var payment PaymentRest
 	err := c.Bind(&payment)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	order, err := p.service.CheckoutOrder(c.Request().Context(), orderID, payment)
+	order, err := p.service.CheckoutOrder(c.Request().Context(), orderID, payment.toCanonical())
 	if err != nil {
 		return c.JSON(http.StatusNotFound, "Product not found")
 	}
-
-	return c.JSON(http.StatusOK, order)
+	return c.JSON(http.StatusOK, orderToResponse(*order))
 }

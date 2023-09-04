@@ -60,17 +60,21 @@ func (s *orderService) CheckoutOrder(ctx context.Context, orderID string, paymen
 	if err != nil {
 		return nil, fmt.Errorf("payment not criated, error searching order, %w", err)
 	}
-	order.Status = canonical.ORDER_PREPARING
 	now := time.Now()
+
+	payment.CreatedAt = &now
+	paymentId, err := s.repo.CheckoutOrder(ctx, orderID, payment)
+	if err != nil {
+		return nil, fmt.Errorf("error checking out order, %w", err)
+	}
+	order.Payment = &canonical.Payment{
+		ID: paymentId,
+	}
+	order.Status = canonical.ORDER_PREPARING
 	order.UpdatedAt = &now
 	err = s.repo.UpdateOrder(ctx, orderID, *order)
 	if err != nil {
 		return nil, fmt.Errorf("payment not criated, error updating order, %w", err)
-	}
-
-	err = s.repo.CheckoutOrder(ctx, orderID, payment)
-	if err != nil {
-		return nil, fmt.Errorf("error checking out order, %w", err)
 	}
 
 	order, err = s.repo.GetByID(ctx, orderID)

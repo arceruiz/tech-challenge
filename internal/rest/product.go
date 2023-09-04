@@ -1,11 +1,12 @@
 package rest
 
 import (
+	"context"
 	"tech-challenge/internal/service"
 
 	"net/http"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type Product interface {
@@ -28,47 +29,73 @@ func NewProductChannel() Product {
 
 func (p *product) RegisterGroup(g *echo.Group) {
 	indexPath := "/"
-	g.GET(indexPath, p.Get)
+	g.GET(indexPath+":id", p.Get)
+	g.GET("", p.GetAll)
 	g.POST(indexPath, p.Add)
-	g.PUT(indexPath+"/:id", p.Update)
-	g.DELETE(indexPath+"/:id", p.Remove)
+	g.PUT(indexPath+":id", p.Update)
+	g.DELETE(indexPath+":id", p.Remove)
 }
 
-func (p *product) Get(c echo.Context) error {
-	productID := c.QueryParam("id")
-	category := c.QueryParam("category")
+func (p *product) GetAll(ctx echo.Context) error {
+	category := ctx.QueryParam("category")
+
+	response, err := p.get(ctx.Request().Context(), "", category)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, nil)
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (p *product) Get(ctx echo.Context) error {
+	productID := ctx.QueryParam("id")
+
+	response, err := p.get(ctx.Request().Context(), productID, "")
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	if len(response) == 0 {
+		return ctx.JSON(http.StatusNotFound, nil)
+	}
+
+	return ctx.JSON(http.StatusOK, response[0])
+}
+
+func (p *product) get(ctx context.Context, productID string, category string) ([]ProductResponse, error) {
+
 	var response []ProductResponse
 
 	if productID != "" {
-		product, err := p.service.GetByID(c.Request().Context(), productID)
+		product, err := p.service.GetByID(ctx, productID)
 		if err != nil {
-			return c.JSON(http.StatusNotFound, "Product not found")
+			return nil, err
 		}
-		return c.JSON(http.StatusOK, productToResponse(*product))
+		return []ProductResponse{productToResponse(*product)}, nil
 	}
 
 	if category != "" {
-		products, err := p.service.GetByCategory(c.Request().Context(), category)
+		products, err := p.service.GetByCategory(ctx, category)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		for _, product := range products {
 			response = append(response, productToResponse(product))
 		}
-		return c.JSON(http.StatusOK, response)
+		return response, nil
 	}
 
-	products, err := p.service.GetProducts(c.Request().Context())
+	products, err := p.service.GetProducts(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, product := range products {
 		response = append(response, productToResponse(product))
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return response, nil
 }
 
 func (p *product) Add(c echo.Context) error {
@@ -78,16 +105,18 @@ func (p *product) Add(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	err = p.service.CreateProduct(c.Request().Context(), newProduct.toCanonical())
+	insertedId, err := p.service.CreateProduct(c.Request().Context(), newProduct.toCanonical())
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, nil)
+	return c.JSON(http.StatusCreated, ProductResponse{
+		ID: insertedId,
+	})
 }
 
 func (p *product) Update(c echo.Context) error {
-	productID := c.QueryParam("id")
+	productID := c.Param("id")
 
 	var updatedProduct ProductRequest
 	err := c.Bind(&updatedProduct)
@@ -104,7 +133,7 @@ func (p *product) Update(c echo.Context) error {
 }
 
 func (p *product) Remove(c echo.Context) error {
-	productID := c.QueryParam("id")
+	productID := c.Param("id")
 
 	err := p.service.Remove(c.Request().Context(), productID)
 	if err != nil {
