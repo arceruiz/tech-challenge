@@ -57,8 +57,13 @@ type OrderItem struct {
 	Quantity int64          `json:"quantity"`
 }
 
-type Payment struct {
+type PaymentRequest struct {
 	ID          int
 	PaymentType int
 	CreatedAt   *time.Time
+}
+
+type PaymentCallback struct {
+	OrderID string `json:"order_id"`
+	Status  string `json:"status"`
 }

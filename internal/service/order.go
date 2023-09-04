@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"tech-challenge/internal/canonical"
 	"tech-challenge/internal/repository"
 	"time"
@@ -54,14 +55,55 @@ func (s *orderService) GetByStatus(ctx context.Context, id string) ([]canonical.
 }
 
 func (s *orderService) CheckoutOrder(ctx context.Context, orderID string, payment canonical.Payment) error {
+	order, err := s.repo.GetByID(ctx, orderID)
+	if err != nil {
+		return fmt.Errorf("payment not criated, error searching order, %w", err)
+	}
 	order.Status = canonical.ORDER_PREPARING
-	order.UpdatedAt = time.Now()
-	err := s.repo.CheckoutOrder(ctx, orderID, payment)
+	now := time.Now()
+	order.UpdatedAt = &now
+	_, err = s.repo.UpdateOrder(ctx, orderID, *order)
+	if err != nil {
+		return fmt.Errorf("payment not criated, error updating order, %w", err)
+	}
+
+	err = s.repo.CheckoutOrder(ctx, orderID, payment)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *orderService) PaymentCallback(ctx context.Context, orderID, status string) error {
+
+	order, err := s.GetByID(ctx, orderID)
+	if err != nil {
+		return fmt.Errorf("payment not updated, error searching order, %w", err)
+	}
+
+	order.Status = s.mapPaymentCallbackStatus(status)
+	now := time.Now()
+	order.UpdatedAt = &now
+
+	s.UpdateOrder(ctx, orderID, *order)
+	if err != nil {
+		return fmt.Errorf("payment not updated, error updating order, %w", err)
+	}
+	return nil
+}
+
+func (s *orderService) mapPaymentCallbackStatus(status string) canonical.OrderStatus {
+	switch status {
+	case "ERROR":
+		return canonical.ORDER_CANCELLED
+	case "COMPLETED":
+		return canonical.ORDER_PREPARING
+	case "PENDING":
+		return canonical.ORDER_RECEIVED
+	default:
+		return canonical.ORDER_RECEIVED
+	}
 }
 
 func (s *orderService) calculateTotal(order *canonical.Order) {

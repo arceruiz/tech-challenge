@@ -54,7 +54,7 @@ func (o *OrderRequest) toCanonical() canonical.Order {
 	return canonical.Order{
 		CustomerID: o.CustomerID,
 		PaymentID:  o.PaymentID,
-		Status:     o.Status,
+		Status:     canonical.OrderStatus(o.Status),
 		OrderItems: orderItems,
 	}
 }
