@@ -38,5 +38,10 @@ func (p *payment) Callback(c echo.Context) error {
 		})
 	}
 
+	err := p.service.PaymentCallback(c.Request().Context(), callback.OrderID, callback.Status)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "error processing callback")
+	}
+
 	return c.JSON(http.StatusOK, nil)
 }

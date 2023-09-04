@@ -87,7 +87,7 @@ func (p *product) Add(c echo.Context) error {
 }
 
 func (p *product) Update(c echo.Context) error {
-	productID := c.Param("id")
+	productID := c.QueryParam("id")
 
 	var updatedProduct ProductRequest
 	err := c.Bind(&updatedProduct)
@@ -104,7 +104,7 @@ func (p *product) Update(c echo.Context) error {
 }
 
 func (p *product) Remove(c echo.Context) error {
-	productID := c.Param("id")
+	productID := c.QueryParam("id")
 
 	err := p.service.Remove(c.Request().Context(), productID)
 	if err != nil {

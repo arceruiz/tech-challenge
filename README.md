@@ -43,3 +43,9 @@ criei /build
 criei /deployments
 cargas .sql nao deveria estar no /assets? https://github.com/golang-standards/project-layout/tree/master/assets
 imagem ainda ta errada no docker compose, precisa usar container repo/registry
+
+
+
+implementar repo/updateorder
+devolver order no checkout
+linkar callback na rest pela negocio 

@@ -87,10 +87,10 @@ func (p *order) CheckoutOrder(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Invalid request payload")
 	}
 
-	err = p.service.CheckoutOrder(c.Request().Context(), orderID, payment)
+	order, err := p.service.CheckoutOrder(c.Request().Context(), orderID, payment)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, "Product not found")
 	}
 
-	return c.JSON(http.StatusOK, nil)
+	return c.JSON(http.StatusOK, order)
 }

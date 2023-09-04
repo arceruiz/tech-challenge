@@ -10,7 +10,7 @@ import (
 type OrderRepository interface {
 	GetOrders(context.Context) ([]canonical.Order, error)
 	CreateOrder(context.Context, canonical.Order) (int, error)
-	UpdateOrder(context.Context, string, canonical.Order) (canonical.Order, error)
+	UpdateOrder(context.Context, string, canonical.Order) error
 	GetByID(context.Context, string) (*canonical.Order, error)
 	GetByStatus(context.Context, string) ([]canonical.Order, error)
 	CheckoutOrder(context.Context, string, canonical.Payment) error
@@ -80,8 +80,14 @@ func (r *orderRepository) CreateOrder(ctx context.Context, order canonical.Order
 	return insertedId, nil
 }
 
-func (r *orderRepository) UpdateOrder(ctx context.Context, id string, updatedOrder canonical.Order) (canonical.Order, error) {
-	return canonical.Order{}, nil
+func (r *orderRepository) UpdateOrder(ctx context.Context, id string, updatedOrder canonical.Order) error {
+	sqlStatement := "UPDATE \"Order\" SET CustomerID = ?, PaymentID = ?, Status = ?, CreatedAt = ?, UpdatedAt = ?, Total = ? WHERE ID = ?"
+
+	_, err := r.db.Exec(ctx, sqlStatement, updatedOrder.CustomerID, updatedOrder.PaymentID, updatedOrder.Status, updatedOrder.CreatedAt, updatedOrder.UpdatedAt, updatedOrder.Total, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *orderRepository) GetByID(ctx context.Context, id string) (*canonical.Order, error) {

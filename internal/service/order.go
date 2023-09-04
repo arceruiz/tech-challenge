@@ -13,10 +13,11 @@ import (
 type OrderService interface {
 	GetOrders(context.Context) ([]canonical.Order, error)
 	CreateOrder(context.Context, canonical.Order) (int, error)
-	UpdateOrder(context.Context, string, canonical.Order) (canonical.Order, error)
+	UpdateOrder(context.Context, string, canonical.Order) error
 	GetByID(context.Context, string) (*canonical.Order, error)
 	GetByStatus(context.Context, string) ([]canonical.Order, error)
-	CheckoutOrder(context.Context, string, canonical.Payment) error
+	CheckoutOrder(context.Context, string, canonical.Payment) (*canonical.Order, error)
+	PaymentCallback(ctx context.Context, orderID, status string) error
 }
 
 type orderService struct {
@@ -42,7 +43,7 @@ func (s *orderService) CreateOrder(ctx context.Context, order canonical.Order) (
 	return s.repo.CreateOrder(ctx, order)
 }
 
-func (s *orderService) UpdateOrder(ctx context.Context, id string, updatedOrder canonical.Order) (canonical.Order, error) {
+func (s *orderService) UpdateOrder(ctx context.Context, id string, updatedOrder canonical.Order) error {
 	return s.repo.UpdateOrder(ctx, id, updatedOrder)
 }
 
@@ -54,25 +55,30 @@ func (s *orderService) GetByStatus(ctx context.Context, id string) ([]canonical.
 	return s.repo.GetByStatus(ctx, id)
 }
 
-func (s *orderService) CheckoutOrder(ctx context.Context, orderID string, payment canonical.Payment) error {
+func (s *orderService) CheckoutOrder(ctx context.Context, orderID string, payment canonical.Payment) (*canonical.Order, error) {
 	order, err := s.repo.GetByID(ctx, orderID)
 	if err != nil {
-		return fmt.Errorf("payment not criated, error searching order, %w", err)
+		return nil, fmt.Errorf("payment not criated, error searching order, %w", err)
 	}
 	order.Status = canonical.ORDER_PREPARING
 	now := time.Now()
 	order.UpdatedAt = &now
-	_, err = s.repo.UpdateOrder(ctx, orderID, *order)
+	err = s.repo.UpdateOrder(ctx, orderID, *order)
 	if err != nil {
-		return fmt.Errorf("payment not criated, error updating order, %w", err)
+		return nil, fmt.Errorf("payment not criated, error updating order, %w", err)
 	}
 
 	err = s.repo.CheckoutOrder(ctx, orderID, payment)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("error checking out order, %w", err)
 	}
 
-	return nil
+	order, err = s.repo.GetByID(ctx, orderID)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving updated order, %w", err)
+	}
+
+	return order, nil
 }
 
 func (s *orderService) PaymentCallback(ctx context.Context, orderID, status string) error {
