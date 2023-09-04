@@ -23,6 +23,7 @@ func New() rest {
 		customer: NewCustomerChannel(),
 		product:  NewProductChannel(),
 		order:    NewOrderChannel(),
+		payment:  NewPaymentChannel(),
 	}
 }
 
