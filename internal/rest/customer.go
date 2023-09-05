@@ -6,13 +6,13 @@ import (
 
 	"net/http"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type Customer interface {
-	RegisterGroup(g *echo.Group)
-	Create(c echo.Context) error
-	Login(c echo.Context) error
+	RegisterGroup(*echo.Group)
+	Create(echo.Context) error
+	Login(echo.Context) error
 }
 
 type customer struct {
@@ -40,7 +40,7 @@ func (u *customer) Create(c echo.Context) error {
 		})
 	}
 
-	customer, err := u.service.Create(customerRequest.toCanonical())
+	customer, err := u.service.Create(c.Request().Context(), customerRequest.toCanonical())
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Response{
@@ -60,7 +60,7 @@ func (u *customer) Login(c echo.Context) error {
 		})
 	}
 
-	token, err := u.service.Login(customerLogin.toCanonical())
+	token, err := u.service.Login(c.Request().Context(), customerLogin.toCanonical())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Response{err.Error()})
 	}

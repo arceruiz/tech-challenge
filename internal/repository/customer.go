@@ -1,36 +1,39 @@
 package repository
 
 import (
-	"database/sql"
+	"context"
 	"tech-challenge/internal/canonical"
+
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type CustomerRepository interface {
-	Create(canonical.Customer) error
-	GetByEmail(email string) (*canonical.Customer, error)
+	Create(context.Context, canonical.Customer) (int, error)
+	GetByEmail(context.Context, string) (*canonical.Customer, error)
 }
 
 type customerRepository struct {
-	db *sql.DB
+	db *pgxpool.Pool
 }
 
 func NewCustomerRepo() CustomerRepository {
 	return &customerRepository{New()}
 }
 
-func (r *customerRepository) Create(user canonical.Customer) error {
-	sqlStatement := "INSERT INTO \"Customer\" (id, name, email, password, document, createdAt) VALUES ($1, $2, $3, $4, $5, $6)"
+func (r *customerRepository) Create(ctx context.Context, user canonical.Customer) (int, error) {
+	sqlStatement := "INSERT INTO \"Customer\" (name, email, password, document, createdAt) VALUES ($1, $2, $3, $4, $5) RETURNING ID"
+	var insertedId int
 
-	_, err := r.db.Exec(sqlStatement, user.Id, user.Name, user.Email, user.Password, user.Document, user.CreatedAt)
+	err := r.db.QueryRow(ctx, sqlStatement, user.Name, user.Email, user.Password, user.Document, user.CreatedAt).Scan(&insertedId)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return insertedId, nil
 }
 
-func (r *customerRepository) GetByEmail(email string) (*canonical.Customer, error) {
-	rows, err := r.db.Query(
+func (r *customerRepository) GetByEmail(ctx context.Context, email string) (*canonical.Customer, error) {
+	rows, err := r.db.Query(ctx,
 		"SELECT * FROM \"Customer\" WHERE Email = $1",
 		email,
 	)
@@ -45,11 +48,11 @@ func (r *customerRepository) GetByEmail(email string) (*canonical.Customer, erro
 	if rows.Next() {
 		if err = rows.Scan(
 			&user.Id,
-			&user.CreatedAt,
-			&user.Document,
-			&user.Email,
-			&user.Password,
 			&user.Name,
+			&user.Email,
+			&user.Document,
+			&user.Password,
+			&user.CreatedAt,
 		); err != nil {
 			return nil, err
 		}

@@ -4,6 +4,7 @@ import "tech-challenge/internal/canonical"
 
 func (p *ProductRequest) toCanonical() canonical.Product {
 	return canonical.Product{
+		ID:          p.ID,
 		Name:        p.Name,
 		Description: p.Description,
 		Price:       p.Price,
@@ -52,9 +53,28 @@ func (o *OrderRequest) toCanonical() canonical.Order {
 
 	return canonical.Order{
 		CustomerID: o.CustomerID,
-		PaymentID:  o.PaymentID,
-		Status:     o.Status,
+		Payment: &canonical.Payment{
+			ID: o.PaymentID,
+		},
 		OrderItems: orderItems,
+	}
+}
+
+func orderToResponse(order canonical.Order) OrderResponse {
+	var productsList []ProductResponse
+
+	for _, product := range order.OrderItems {
+		productsList = append(productsList, productToResponse(product.Product))
+	}
+
+	return OrderResponse{
+		ID:          order.ID,
+		CustomerID:  order.CustomerID,
+		Status:      int(order.Status),
+		CreatedAt:   order.CreatedAt,
+		UpdatedAt:   order.UpdatedAt,
+		Products:    productsList,
+		PaymentRest: paymentToResponse(order.Payment),
 	}
 }
 
@@ -62,5 +82,24 @@ func (items *OrderItem) toCanonical() canonical.OrderItem {
 	return canonical.OrderItem{
 		Product:  items.Product.toCanonical(),
 		Quantity: items.Quantity,
+	}
+}
+
+func paymentToResponse(payment *canonical.Payment) *PaymentRest {
+	if payment == nil {
+		return nil
+	}
+
+	return &PaymentRest{
+		ID:          payment.ID,
+		PaymentType: payment.PaymentType,
+		CreatedAt:   payment.CreatedAt,
+		Status:      int(payment.Status),
+	}
+}
+
+func (pr *PaymentRest) toCanonical() canonical.Payment {
+	return canonical.Payment{
+		PaymentType: pr.PaymentType,
 	}
 }
