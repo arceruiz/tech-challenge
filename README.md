@@ -5,16 +5,22 @@
 > 1. docker
 > 1. kubernetes
 
-# Como buildar:
+# Como buildar local:
 
 ```shell
-make build
+make build-all
 ```
 
-# Como executar:
+# Como executar local:
 
 ```shell
-make install
+make run
+```
+
+# Como enviar para o k8s:
+
+```shell
+kubectl create namespace fiap && kubectl apply -f deployments/manifest.yml -n fiap
 ```
 
 # DB Efemero
