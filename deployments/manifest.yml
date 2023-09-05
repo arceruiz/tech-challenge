@@ -83,7 +83,7 @@ spec:
     spec:
       containers:
         - name: tech-challenge
-          image: mauricio1998/tech-challenge:v1
+          image: mauricio1998/tech-challenge
           imagePullPolicy: Always
           envFrom:
             - secretRef:
