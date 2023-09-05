@@ -93,11 +93,11 @@ func (r *orderRepository) UpdateOrder(ctx context.Context, id string, updatedOrd
 }
 
 func (r *orderRepository) GetByID(ctx context.Context, id string) (*canonical.Order, error) {
-	var orderDTO Order
+	var orderDTO OrderJoinPayment
 	var order *canonical.Order
 	var batch pgx.Batch
 
-	batch.Queue(`SELECT o.*, p.PaymentType, p.createdat AS paymentCreatedat FROM "Order" o INNER JOIN "Payment" p ON p.Id = o.paymentid WHERE o.ID = $1;`, id)
+	batch.Queue(`SELECT o.*, p.PaymentType, p.createdat AS paymentCreatedat, p.status as paymentstatus FROM "Order" o LEFT JOIN "Payment" p ON p.Id = o.paymentid WHERE o.ID = $1;`, id)
 	batch.Queue(`SELECT p.id, p.name, p.description, p.price, p.category, p.status, p.imagepath, oi.quantity FROM "Order_Items" oi JOIN "Product" p ON p.ID = oi.productid WHERE oi.orderid = $1;`, id)
 
 	results := r.db.SendBatch(ctx, &batch)
@@ -118,7 +118,8 @@ func (r *orderRepository) GetByID(ctx context.Context, id string) (*canonical.Or
 			&orderDTO.UpdatedAt,
 			&orderDTO.Total,
 			&orderDTO.PaymentType,
-			&orderDTO.paymentCreatedat,
+			&orderDTO.PaymentCreatedat,
+			&orderDTO.PaymentStatus,
 		); err != nil {
 			return nil, err
 		}
@@ -198,10 +199,10 @@ func (r *orderRepository) GetByStatus(ctx context.Context, status string) ([]can
 }
 
 func (r *orderRepository) CheckoutOrder(ctx context.Context, orderID string, payment canonical.Payment) (int, error) {
-	sqlStatement := "INSERT INTO \"Payment\" (PaymentType, CreatedAt) VALUES ($1, $2) RETURNING ID"
+	sqlStatement := "INSERT INTO \"Payment\" (PaymentType, CreatedAt, Status) VALUES ($1, $2, $3) RETURNING ID"
 
 	var insertedId int
-	err := r.db.QueryRow(ctx, sqlStatement, payment.PaymentType, payment.CreatedAt).Scan(&insertedId)
+	err := r.db.QueryRow(ctx, sqlStatement, payment.PaymentType, payment.CreatedAt, payment.Status).Scan(&insertedId)
 	if err != nil {
 		return 0, err
 	}

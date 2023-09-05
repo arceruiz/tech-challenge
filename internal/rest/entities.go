@@ -69,6 +69,7 @@ type PaymentRest struct {
 	ID          int        `json:"id"`
 	PaymentType int        `json:"payment_type"`
 	CreatedAt   *time.Time `json:"created_at"`
+	Status      int        `json:"status"`
 }
 
 type PaymentCallback struct {

@@ -2,7 +2,7 @@ package repository
 
 import "time"
 
-type Order struct {
+type OrderJoinPayment struct {
 	ID               int
 	CustomerID       int
 	PaymentID        *int
@@ -11,5 +11,16 @@ type Order struct {
 	UpdatedAt        *time.Time
 	Total            float64
 	PaymentType      *int
-	paymentCreatedat *time.Time
+	PaymentCreatedat *time.Time
+	PaymentStatus    *int
+}
+
+type Order struct {
+	ID         int
+	CustomerID int
+	PaymentID  *int
+	Status     int
+	CreatedAt  *time.Time
+	UpdatedAt  *time.Time
+	Total      float64
 }

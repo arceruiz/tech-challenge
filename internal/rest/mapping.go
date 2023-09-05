@@ -94,6 +94,7 @@ func paymentToResponse(payment *canonical.Payment) *PaymentRest {
 		ID:          payment.ID,
 		PaymentType: payment.PaymentType,
 		CreatedAt:   payment.CreatedAt,
+		Status:      int(payment.Status),
 	}
 }
 

@@ -33,6 +33,7 @@ type Order struct {
 }
 
 type OrderStatus int
+type PaymentStatus int
 
 const (
 	ORDER_CANCELLED  OrderStatus = 0
@@ -40,6 +41,12 @@ const (
 	ORDER_PREPARING  OrderStatus = 2
 	ORDER_READY      OrderStatus = 3
 	ORDER_DELIEVERED OrderStatus = 4
+)
+
+const (
+	PAYMENT_INIT  PaymentStatus = 0
+	PAYMENT_OK    PaymentStatus = 1
+	PAYMENT_ERROR PaymentStatus = 2
 )
 
 type OrderItem struct {
@@ -51,5 +58,5 @@ type Payment struct {
 	ID          int
 	PaymentType int
 	CreatedAt   *time.Time
-	Status      int
+	Status      PaymentStatus
 }

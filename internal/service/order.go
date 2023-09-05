@@ -63,6 +63,7 @@ func (s *orderService) CheckoutOrder(ctx context.Context, orderID string, paymen
 	now := time.Now()
 
 	payment.CreatedAt = &now
+	payment.Status = 0
 	paymentId, err := s.repo.CheckoutOrder(ctx, orderID, payment)
 	if err != nil {
 		return nil, fmt.Errorf("error checking out order, %w", err)

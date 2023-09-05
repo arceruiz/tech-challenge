@@ -13,7 +13,11 @@
             "args": [
                 "--config-dir",
                 "${workspaceFolder}/internal/config/"
-            ]
+            ],
+            "env": {
+                "APP_DB_CONNECTIONSTRING": "host=localhost port=5432 dbname=fiap_tech_challenge user=postgres password=1234 sslmode=disable",
+                "APP_TOKEN_KEY": "vuIXaOK4OpJWA9ySX1UTpIWshXPpP6neGKGA724FauY"
+            }
         }
     ]
 }
