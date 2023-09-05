@@ -47,7 +47,18 @@ const (
 	PAYMENT_INIT  PaymentStatus = 0
 	PAYMENT_OK    PaymentStatus = 1
 	PAYMENT_ERROR PaymentStatus = 2
+	PAYMENT_NOK   PaymentStatus = 2
 )
+
+var MapPaymentStatus = map[string]PaymentStatus{
+	"OK":        PAYMENT_OK,
+	"NOK":       PAYMENT_NOK,
+	"ERROR":     PAYMENT_ERROR,
+	"INIT":      PAYMENT_INIT,
+	"":          PAYMENT_ERROR,
+	"COMPLETED": PAYMENT_OK,
+	"PENDING":   PAYMENT_INIT,
+}
 
 type OrderItem struct {
 	Product

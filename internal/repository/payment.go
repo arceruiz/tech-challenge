@@ -9,6 +9,7 @@ import (
 
 type PaymentRepository interface {
 	GetByID(context.Context, string) (*canonical.Payment, error)
+	Update(ctx context.Context, id string, payment canonical.Payment) error
 }
 
 type paymentRepository struct {
@@ -17,6 +18,16 @@ type paymentRepository struct {
 
 func NewPaymentRepo() PaymentRepository {
 	return &paymentRepository{New()}
+}
+
+func (r *paymentRepository) Update(ctx context.Context, id string, payment canonical.Payment) error {
+	sqlStatement := "UPDATE \"Payment\" SET (PaymentType, CreatedAt, Status) VALUES ($1, $2, $3) where ID = $4"
+
+	_, err := r.db.Exec(ctx, sqlStatement, payment.PaymentType, payment.CreatedAt, payment.Status, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *paymentRepository) GetByID(ctx context.Context, id string) (*canonical.Payment, error) {

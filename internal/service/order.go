@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"tech-challenge/internal/canonical"
 	"tech-challenge/internal/repository"
 	"time"
@@ -21,12 +22,14 @@ type OrderService interface {
 }
 
 type orderService struct {
-	repo repository.OrderRepository
+	repo           repository.OrderRepository
+	paymentService PaymentService
 }
 
 func NewOrderService() OrderService {
 	return &orderService{
-		repository.NewOrderRepo(),
+		repo:           repository.NewOrderRepo(),
+		paymentService: NewPaymentService(),
 	}
 }
 
@@ -63,7 +66,7 @@ func (s *orderService) CheckoutOrder(ctx context.Context, orderID string, paymen
 	now := time.Now()
 
 	payment.CreatedAt = &now
-	payment.Status = 0
+	payment.Status = canonical.PAYMENT_INIT
 	paymentId, err := s.repo.CheckoutOrder(ctx, orderID, payment)
 	if err != nil {
 		return nil, fmt.Errorf("error checking out order, %w", err)
@@ -101,6 +104,9 @@ func (s *orderService) PaymentCallback(ctx context.Context, orderID, status stri
 	if err != nil {
 		return fmt.Errorf("payment not updated, error updating order, %w", err)
 	}
+
+	s.paymentService.Callback(ctx, strconv.Itoa(order.Payment.ID), status)
+
 	return nil
 }
 
