@@ -1,3 +1,5 @@
+#mauricio1998/tech-db
+
 FROM postgres:latest
 
 ENV POSTGRES_DB="fiap_tech_challenge"

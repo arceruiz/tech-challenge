@@ -21,8 +21,7 @@ func NewPaymentRepo() PaymentRepository {
 }
 
 func (r *paymentRepository) Update(ctx context.Context, id string, payment canonical.Payment) error {
-	sqlStatement := "UPDATE \"Payment\" SET (PaymentType, CreatedAt, Status) VALUES ($1, $2, $3) where ID = $4"
-
+	sqlStatement := "UPDATE \"Payment\" SET PaymentType = $1, CreatedAt = $2, Status = $3 where ID = $4"
 	_, err := r.db.Exec(ctx, sqlStatement, payment.PaymentType, payment.CreatedAt, payment.Status, id)
 	if err != nil {
 		return err
