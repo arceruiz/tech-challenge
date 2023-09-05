@@ -1,0 +1,9 @@
+#mauricio1998/tech-db
+
+FROM postgres:latest
+
+ENV POSTGRES_DB="fiap_tech_challenge"
+ENV POSTGRES_PASSWORD="1234"
+ENV POSTGRES_USER="postgres"
+
+COPY ./schema.sql ./docker-entrypoint-initdb.d/

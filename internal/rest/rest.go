@@ -4,7 +4,7 @@ import (
 	"tech-challenge/internal/config"
 	"tech-challenge/internal/middlewares"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 var (
@@ -15,6 +15,7 @@ type rest struct {
 	customer Customer
 	product  Product
 	order    Order
+	payment  Payment
 }
 
 func New() rest {
@@ -22,6 +23,7 @@ func New() rest {
 		customer: NewCustomerChannel(),
 		product:  NewProductChannel(),
 		order:    NewOrderChannel(),
+		payment:  NewPaymentChannel(),
 	}
 }
 
@@ -42,6 +44,10 @@ func (r rest) Start() error {
 	orderGroup := mainGroup.Group("/order")
 	r.order.RegisterGroup(orderGroup)
 	orderGroup.Use(middlewares.Authorization)
+
+	paymentGroup := mainGroup.Group("/payment")
+	r.payment.RegisterGroup(paymentGroup)
+	paymentGroup.Use(middlewares.Authorization)
 
 	return router.Start(":" + cfg.Server.Port)
 }

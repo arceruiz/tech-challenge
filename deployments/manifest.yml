@@ -1,0 +1,168 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-config
+  namespace: fiap
+type: Opaque
+data:
+  POSTGRES_DB: "ZmlhcF90ZWNoX2NoYWxsZW5nZQ=="
+  POSTGRES_USER: "cG9zdGdyZXM="
+  POSTGRES_PASSWORD: "MTIzNA=="
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-config
+  namespace: fiap
+type: Opaque
+data:
+  APP_TOKEN_KEY: "dnVJWGFPSzRPcEpXQTl5U1gxVVRwSVdzaFhQcFA2bmVHS0dBNzI0RmF1WQ=="
+  APP_DB_CONNECTIONSTRING: "aG9zdD1wb3N0Z3Jlcy1zZXJ2aWNlLmZpYXAuc3ZjLmNsdXN0ZXIubG9jYWwgcG9ydD01NDMyIGRibmFtZT1maWFwX3RlY2hfY2hhbGxlbmdlIHVzZXI9cG9zdGdyZXMgcGFzc3dvcmQ9MTIzNCBzc2xtb2RlPWRpc2FibGU="
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tech-challenge
+  name: postgres
+  namespace: fiap
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - envFrom:
+        - secretRef:
+            name: db-config
+        image: mauricio1998/tech-db
+        imagePullPolicy: Always
+        name: postgres
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+      #   volumeMounts:
+      #   - mountPath: /var/lib/postgresql/data
+      #     name: postgres-storage
+      # volumes:
+      # - name: postgres-storage
+      #   persistentVolumeClaim:
+      #     claimName: postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tech-challenge
+  labels:
+    app: tech-challenge-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tech-challenge-app
+  template:
+    metadata:
+      labels:
+        app: tech-challenge-app
+    spec:
+      containers:
+        - name: tech-challenge
+          image: mauricio1998/tech-challenge
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: app-config          
+          ports:
+            - containerPort: 3001
+          volumeMounts:
+            - name: configmap-tech-challenge
+              subPath: config.yaml
+              mountPath: /app/config.yaml
+      volumes:
+        - name: configmap-tech-challenge
+          configMap:
+            name: "tech-challenge-cm"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tech-challenge-app
+  labels:
+    app: tech-challenge-app
+spec:
+  selector:
+    app: tech-challenge-app
+  ports:
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
+  type: LoadBalancer
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: postgres-pv
+#   namespace: fiap
+#   labels:
+#     app: tech-challenge
+# spec:
+#   claimRef:
+#     name: postgres-pvc
+#     namespace: fiap
+#   capacity:
+#     storage: 1Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   local:
+#     path: /data
+#   nodeAffinity:
+#     required:
+#       nodeSelectorTerms:
+#       - matchExpressions:
+#         - key: kubernetes.io/hostname
+#           operator: In
+#           values:
+#           - k3d-tech-challenge-server-0
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: postgres-pvc
+#   namespace: fiap
+#   labels:
+#     app: tech-challenge
+# spec:
+#   storageClassName: local-storage
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 500Mi
+---
+apiVersion: v1
+data: 
+  config.yaml: |
+    server:
+      port: 3001
+kind: ConfigMap
+metadata:
+  labels:
+    app: tech-challenge
+  name: tech-challenge-cm
+  namespace: fiap
