@@ -30,8 +30,10 @@ func (p *order) RegisterGroup(g *echo.Group) {
 	g.GET("", p.GetAll)
 	g.GET("/:id", p.Get)
 	g.POST("/checkout", p.CheckoutOrder)
-	g.POST("/create", p.Create)
+	g.POST("/", p.Create)
+	//g.POST("/", p.ready) needs to be implemented
 	g.PUT("/:id", p.Update)
+
 }
 
 func (p *order) GetAll(ctx echo.Context) error {

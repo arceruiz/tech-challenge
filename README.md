@@ -31,7 +31,7 @@ Para executar o DB optamos por seguir com DB efemero. Sendo assim, cada vez que 
 Por conta disso, seguimos com DB efemero para que os manifestos sejam aplicados e tudo funcione sem nenhum problema/configuração adicional. Para que a persistencia dos dados não seja perdida, basta alterar o arquivo deployments/manifest.yml descomentando as linhas comentadas e ajustar o caminho no PersistentVolume.
 
 
-# Tasks Challange 3
+# Challange 3 Tasks
 
 ## A Solução:
 
