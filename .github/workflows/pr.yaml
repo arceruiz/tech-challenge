@@ -16,4 +16,4 @@ jobs:
       - name: Install dependencies
         run: go get .
       - name: Build
-        run: go build -v ./...
+        run: CGO_ENABLED=0 go build -v -o dist/tech-challenge cmd/client/main.go
