@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-    permissions: write-all
     runs-on: ubuntu-latest
 
     steps:
@@ -16,12 +15,6 @@ jobs:
         with:
           go-version: '1.20.x'
       - name: Install dependencies
-        run: go get ./...
+        run: go get .
       - name: Build
         run: CGO_ENABLED=0 go build -v -o dist/tech-challenge cmd/client/main.go
-      - uses: LouisBrunner/checks-action@v1.6.1
-        if: always()
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: Test XYZ
-          conclusion: ${{ job.status }}
