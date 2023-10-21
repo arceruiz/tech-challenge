@@ -1,3 +1,4 @@
+name: pull_request_workflow
 on:
   pull_request:
     branches:    

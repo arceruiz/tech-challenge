@@ -1,3 +1,4 @@
+name: ci_workflow
 on:
   push:
     branches:
