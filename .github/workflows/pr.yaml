@@ -18,3 +18,9 @@ jobs:
         run: go get .
       - name: Build
         run: CGO_ENABLED=0 go build -v -o dist/tech-challenge cmd/client/main.go
+      - uses: LouisBrunner/checks-action@v1.6.1
+        if: always()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Test XYZ
+          conclusion: ${{ job.status }}
