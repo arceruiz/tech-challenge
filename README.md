@@ -25,11 +25,23 @@ make run
 kubectl create namespace fiap && kubectl apply -f deployments/manifest.yml -n fiap
 ```
 
-# DB Efemero
+# Grupo de Repositorios
 
-Para executar o DB optamos por seguir com DB efemero. Sendo assim, cada vez que a pod do DB for terminada, os dados serão perdidos. O motivo do DB estar efemero é porque o tipo de volume persistente que a instância de Kubernetes que utilizamos suporta necessita de um caminho local do node em que o volume é montado. 
-Por conta disso, seguimos com DB efemero para que os manifestos sejam aplicados e tudo funcione sem nenhum problema/configuração adicional. Para que a persistencia dos dados não seja perdida, basta alterar o arquivo deployments/manifest.yml descomentando as linhas comentadas e ajustar o caminho no PersistentVolume.
+[Link](https://github.com/arceruiz/) para repositorio do Lambda
+[Link](https://github.com/arceruiz/) para repositorio EKS com Terraform
+[Link](https://github.com/arceruiz/) para repositorio RDS com Terraform
+[Link](https://github.com/arceruiz/tech-challenge) para repositório da aplicação principal
 
+
+# Porque escolhemos PostgreSQL?
+
+Escolhemos utilizar um banco SQL em vez de NoSQL por conta de várias vantagens significativas que os bancos de dados SQL oferecem. Em primeiro lugar, bancos de dados SQL se destacam em termos de integridade e consistência de dados. Eles fornecem um esquema bem definido e que impõe restrições aos dados, garantindo a estrutura e precisão. Isso é particularmente importante para projetos como o nosso, do fast-food, que qualidade e confiabilidade dos dados são fundamentais. Além disso, DBs SQL são adequados para consultas mais complexas e modelagem de dados, facilitando muito em cenários nos quais é preciso analisar dados de forma abrangente e/ou realizar manipulações avançadas de dados para relatórios gerenciais por exemplo. Escolhemos PostgreSQL e não outro DB SQL por diversos fatores, dentre eles:
+ - Grande comunidade, facilitando acesso a exemplos e problemas já resolvidos;
+ - Free/Opensource, diminuindo a barreira de entrada, diminuindo custos e promovendo uma evolução simplificada da plataforma;
+ - Extensibilidade, permite criação de tipos de dado customizados, bem como operadores e funções;
+ - Herança de tabelas, permitindo que uma tabela herde propriedades de outra tabela;
+ - Full-Text Search e Text Indexing que apesar de existir em outras linguagens, aqui alinhado com os tipos de dados customizáveis permite também a criação de dicionarios de busca textual customizados;
+ 
 
 # Challange 3 Tasks
 
@@ -86,13 +98,13 @@ As informações dispostas no sistema de pedidos precisarão ser gerenciadas pel
 
 Dando continuidade ao desenvolvimento do software para a lanchonete, teremos as seguintes melhorias e alterações:
 
-1. Implementar um API Gateway e um AWS Lambda para autenticar o cliente com base no CPF:
-    1. Integrar ao Amazon Cognito para identificar o cliente.
-    1. Usar Lambda Authorizer para esse processo.
+1. Implementar um API Gateway e um function serverless para autenticar o cliente com base no CPF
+1. Integrar o sistema de autenticação para identificar o cliente.
 1. Implementar as melhores práticas de CI/CD para a aplicação, segregando os códigos em repositórios, por exemplo:
     1. 1 repositório para o lambda.
-    1. 1 repositório para sua infra EKS com Terraform.
-    1. 1 repositório para sua infra RDS com Terraform.
+    1. 1 repositório para sua infra kubernetes com Terraform.  
+    1. 1 repositório para sua infra banco com Terraform.
     1. 1 repositório para sua aplicação que é executada no Kubernetes.
 1. Os repositórios devem fazer deploy automatizado na conta AWS utilizando Github Actions, as branchs main/master devem ser protegidas não permitindo commits direto, sempre utilizar pull request.
 1. Melhorar a estrutura do banco de dados escolhido, documentar seguindo os padrões de modelagem de dados e justificar a escolha do banco de dados.
+1. Utilizar serviços serverles (functions)
