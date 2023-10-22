@@ -28,9 +28,8 @@ func NewPaymentChannel() Payment {
 }
 
 func (p *payment) RegisterGroup(g *echo.Group) {
-	indexPath := "/"
-	g.GET(indexPath+":id", p.GetByID)
-	g.POST(indexPath+"callback", p.Callback)
+	g.GET("/:id", p.GetByID)
+	g.POST("/callback", p.Callback)
 
 }
 

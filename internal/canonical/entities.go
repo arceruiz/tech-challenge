@@ -17,7 +17,7 @@ type Product struct {
 	Description string
 	Price       float64
 	Category    string
-	Status      int
+	Status      BaseStatus
 	ImagePath   string
 }
 
@@ -32,34 +32,6 @@ type Order struct {
 	OrderItems []OrderItem //orderProduct
 }
 
-type OrderStatus int
-type PaymentStatus int
-
-const (
-	ORDER_CANCELLED  OrderStatus = 0
-	ORDER_RECEIVED   OrderStatus = 1
-	ORDER_PREPARING  OrderStatus = 2
-	ORDER_READY      OrderStatus = 3
-	ORDER_DELIEVERED OrderStatus = 4
-)
-
-const (
-	PAYMENT_INIT  PaymentStatus = 0
-	PAYMENT_OK    PaymentStatus = 1
-	PAYMENT_ERROR PaymentStatus = 2
-	PAYMENT_NOK   PaymentStatus = 2
-)
-
-var MapPaymentStatus = map[string]PaymentStatus{
-	"OK":        PAYMENT_OK,
-	"NOK":       PAYMENT_NOK,
-	"ERROR":     PAYMENT_ERROR,
-	"INIT":      PAYMENT_INIT,
-	"":          PAYMENT_ERROR,
-	"COMPLETED": PAYMENT_OK,
-	"PENDING":   PAYMENT_INIT,
-}
-
 type OrderItem struct {
 	Product
 	Quantity int64
@@ -70,4 +42,53 @@ type Payment struct {
 	PaymentType int
 	CreatedAt   *time.Time
 	Status      PaymentStatus
+}
+
+type BaseStatus int
+type OrderStatus int
+type PaymentStatus int
+
+const (
+	STATUS_ACTIVE BaseStatus = iota
+	STATUS_INACTIVE
+)
+
+const (
+	ORDER_READY OrderStatus = iota
+	ORDER_PREPARING
+	ORDER_RECEIVED
+	ORDER_DELIEVERED
+	ORDER_CONCLUDED
+	ORDER_CANCELLED
+)
+
+const (
+	PAYMENT_CREATED PaymentStatus = iota
+	PAYMENT_PAYED
+	PAYMENT_ERROR
+	PAYMENT_FAILED
+)
+
+var MapBaseStatus = map[string]BaseStatus{ //ajustar chaves
+	"ACTIVE":   STATUS_ACTIVE,
+	"INACTIVE": STATUS_INACTIVE,
+}
+
+var MapOrderStatus = map[string]OrderStatus{ //ajustar chaves
+	"OK":        ORDER_CANCELLED,
+	"NOK":       ORDER_RECEIVED,
+	"ERROR":     ORDER_PREPARING,
+	"INIT":      ORDER_READY,
+	"":          ORDER_DELIEVERED,
+	"COMPLETED": ORDER_CONCLUDED,
+}
+
+var MapPaymentStatus = map[string]PaymentStatus{
+	"OK":        PAYMENT_PAYED,
+	"NOK":       PAYMENT_FAILED,
+	"ERROR":     PAYMENT_ERROR,
+	"INIT":      PAYMENT_CREATED,
+	"":          PAYMENT_ERROR,
+	"COMPLETED": PAYMENT_PAYED,
+	"PENDING":   PAYMENT_CREATED,
 }

@@ -26,7 +26,18 @@ func NewOrderRepo() OrderRepository {
 }
 
 func (r *orderRepository) GetOrders(ctx context.Context) ([]canonical.Order, error) {
-	sqlStatement := "SELECT * FROM \"Order\" where Status != 4 ORDER BY Status, createdat DESC"
+	sqlStatement :=
+		`
+		SELECT 
+			* 
+		FROM 
+			"Order" 
+		WHERE
+			Status < 3
+		ORDER BY
+			Status, 
+			createdat
+		`
 
 	orderRows, err := r.db.Query(ctx,
 		sqlStatement,

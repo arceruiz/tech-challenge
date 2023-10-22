@@ -9,7 +9,7 @@ func (p *ProductRequest) toCanonical() canonical.Product {
 		Description: p.Description,
 		Price:       p.Price,
 		Category:    p.Category,
-		Status:      p.Status,
+		Status:      canonical.BaseStatus(p.Status),
 		ImagePath:   p.ImagePath,
 	}
 }
@@ -21,7 +21,7 @@ func productToResponse(p canonical.Product) ProductResponse {
 		Description: p.Description,
 		Price:       p.Price,
 		Category:    p.Category,
-		Status:      p.Status,
+		Status:      int(p.Status),
 		ImagePath:   p.ImagePath,
 	}
 }
