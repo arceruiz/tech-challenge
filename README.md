@@ -27,7 +27,7 @@ kubectl create namespace fiap && kubectl apply -f deployments/manifest.yml -n fi
 
 # Grupo de Repositorios
 
-[Link](https://github.com/arceruiz/) para repositorio do Lambda
+[Link](https://github.com/mauriciodm1998/tech-challenge-auth) para repositorio do Lambda
 [Link](https://github.com/arceruiz/) para repositorio EKS com Terraform
 [Link](https://github.com/arceruiz/) para repositorio RDS com Terraform
 [Link](https://github.com/arceruiz/tech-challenge) para repositório da aplicação principal
