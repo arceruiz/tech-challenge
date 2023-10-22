@@ -17,6 +17,7 @@ type CustomerService interface {
 	Create(context.Context, canonical.Customer) (*canonical.Customer, error)
 	Login(context.Context, canonical.Customer) (string, error)
 	Bypass() (string, error)
+	Get(context.Context, canonical.Customer) (*canonical.Customer, error)
 }
 
 type customerService struct {
@@ -85,4 +86,22 @@ func (u *customerService) Bypass() (string, error) {
 	}
 
 	return token, nil
+}
+
+func (u *customerService) Get(ctx context.Context, customer canonical.Customer) (*canonical.Customer, error) {
+	if customer.Document != "" {
+		baseCustomer, err := u.repo.GetByDocument(ctx, customer.Document)
+		if err != nil {
+			return nil, err
+		}
+
+		return baseCustomer, nil
+	}
+
+	baseCustomer, err := u.repo.GetByEmail(ctx, customer.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	return baseCustomer, nil
 }
