@@ -47,3 +47,13 @@ ADD CONSTRAINT order_items_product_fk FOREIGN KEY (ProductID) REFERENCES "Produc
 
 ALTER TABLE "Order"
 ADD CONSTRAINT order_customer_fk FOREIGN KEY (CustomerID) REFERENCES "Customer" (ID);
+
+
+CREATE INDEX idx_customer_email
+ON "Customer"(Email);
+
+CREATE INDEX idx_order_status
+ON "Order"(Status);
+
+CREATE INDEX idx_product_category
+ON "Product"(Category);
