@@ -32,7 +32,5 @@ func main() {
 	}()
 
 	logrus.WithField("grpc server started on: ", cfg.Server.CustomerPort).Info()
-	// porque nao esta logando?
-
 	<-stop
 }

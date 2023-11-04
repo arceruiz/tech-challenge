@@ -9,6 +9,11 @@ import (
 	protocol "google.golang.org/grpc"
 )
 
+type grpcServer struct {
+	svc service.CustomerService
+	UnimplementedCustomerServiceServer
+}
+
 func Listen(port int) error {
 	server := protocol.NewServer()
 	listener, err := net.Listen("tcp", ":"+strconv.Itoa(port))
@@ -21,11 +26,6 @@ func Listen(port int) error {
 	})
 
 	return server.Serve(listener)
-}
-
-type grpcServer struct {
-	svc service.CustomerService
-	UnimplementedCustomerServiceServer
 }
 
 func (r *grpcServer) Get(ctx context.Context, customer *Customer) (*Customer, error) {
