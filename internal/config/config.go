@@ -16,7 +16,8 @@ type Config struct {
 		Key string `cfg:"key"`
 	} `cfg:"token"`
 	Server struct {
-		Port string `cfg:"port"`
+		Port         string `cfg:"port"`
+		CustomerPort int    `cfg:"customerPort"`
 	} `cfg:"server"`
 	DB struct {
 		ConnectionString string `cfg:"connectionString"`
