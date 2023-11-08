@@ -22,14 +22,14 @@ make run
 # Como enviar para o k8s:
 
 ```shell
-kubectl create namespace fiap && kubectl apply -f deployments/manifest.yml -n fiap
+kubectl create namespace fiap && kubectl apply -f deployments/eks-manifests -n fiap
 ```
 
 # Grupo de Repositorios
 
 [Link](https://github.com/mauriciodm1998/tech-challenge-auth) para repositorio do Lambda
-[Link](https://github.com/arceruiz/) para repositorio EKS com Terraform
-[Link](https://github.com/arceruiz/) para repositorio RDS com Terraform
+[Link](https://github.com/mauriciodm1998/tech-challenge-eks-gitops) para repositorio EKS com Terraform
+[Link](https://github.com/arceruiz/tech-challange-db-gitops) para repositorio RDS com Terraform
 [Link](https://github.com/arceruiz/tech-challenge) para repositório da aplicação principal
 
 

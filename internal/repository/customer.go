@@ -10,6 +10,7 @@ import (
 type CustomerRepository interface {
 	Create(context.Context, canonical.Customer) (int, error)
 	GetByEmail(context.Context, string) (*canonical.Customer, error)
+	GetByDocument(context.Context, string) (*canonical.Customer, error)
 }
 
 type customerRepository struct {
@@ -36,6 +37,36 @@ func (r *customerRepository) GetByEmail(ctx context.Context, email string) (*can
 	rows, err := r.db.Query(ctx,
 		"SELECT * FROM \"Customer\" WHERE Email = $1",
 		email,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var user canonical.Customer
+
+	if rows.Next() {
+		if err = rows.Scan(
+			&user.Id,
+			&user.Name,
+			&user.Email,
+			&user.Document,
+			&user.Password,
+			&user.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		return &user, nil
+	}
+
+	return nil, ErrorNotFound
+}
+
+func (r *customerRepository) GetByDocument(ctx context.Context, document string) (*canonical.Customer, error) {
+	rows, err := r.db.Query(ctx,
+		"SELECT * FROM \"Customer\" WHERE Document = $1",
+		document,
 	)
 	if err != nil {
 		return nil, err

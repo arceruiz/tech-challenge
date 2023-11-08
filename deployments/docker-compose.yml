@@ -1,6 +1,7 @@
 version: '3'
 services:
   postgres:
+    container_name: postgres
     image: mauricio1998/tech-db
     volumes:
       - ../build/schema.sql:/docker-entrypoint-initdb.d/schema.sql
@@ -13,10 +14,18 @@ services:
     networks:
       - tech-challenge-nw
 
-  tech-challenge-fase-1:
-    image: mauricio1998/tech-challenge
+  tech-challenge:
+    image: tech-challenge
     ports:
       - "3001:3001"
+      - "3002:3002"
+    networks:
+      - tech-challenge-nw
+
+  tech-challenge-auth:
+    image: auth
+    ports:
+      - "3003:3003"
     networks:
       - tech-challenge-nw
 

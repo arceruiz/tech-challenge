@@ -1,0 +1,12 @@
+syntax = "proto3";
+option go_package = "internal/channels/grpc";
+
+service CustomerService {
+    rpc Get(Customer) returns (Customer){}
+}
+
+message Customer {
+    string Email = 1;
+    string Document = 2;
+    string Password = 3;
+}

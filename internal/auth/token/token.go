@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 	"tech-challenge/internal/config"
-	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -14,20 +13,6 @@ import (
 var (
 	cfg = &config.Cfg
 )
-
-func GenerateToken(userId int) (string, error) {
-	permissions := jwt.MapClaims{}
-
-	if userId == 1 {
-		permissions["guest"] = true
-	}
-	permissions["authorized"] = true
-	permissions["exp"] = time.Now().Add(time.Hour * 6).Unix()
-	permissions["userId"] = userId
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissions)
-
-	return token.SignedString([]byte(cfg.Token.Key))
-}
 
 func ValidateToken(r *http.Request) error {
 	tokenString := getToken(r)
@@ -60,24 +45,4 @@ func returnSecretKey(token *jwt.Token) (interface{}, error) {
 	}
 
 	return []byte(cfg.Token.Key), nil
-}
-
-func GetUserId(r *http.Request) (string, error) {
-	tokenString := getToken(r)
-
-	token, err := jwt.Parse(tokenString, returnSecretKey)
-	if err != nil {
-		return "", err
-	}
-
-	if permissions, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userId := fmt.Sprintf("%.0f", permissions["userId"])
-		if err != nil {
-			return "", nil
-		}
-
-		return userId, nil
-	}
-
-	return "", errors.New("invalid token")
 }
