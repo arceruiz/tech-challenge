@@ -1,55 +1,54 @@
 @startuml
 
-entity "Customer" as Customer {
-  +ID (PK)
+entity "Customer" {
+  + ID : SERIAL
   --
-  Name
-  Email
-  Document
-  Password
-  CreatedAt
+  Name VARCHAR(255)
+  ~ Email VARCHAR(255)
+  Document VARCHAR(255)
+  Password VARCHAR(255)
+  CreatedAt TIMESTAMP WITH TIME ZONE
 }
 
-
-entity "Product" as Product {
-  +ID (PK)
+entity "Product" {
+  + ID : SERIAL
   --
-  Name
-  Desc
-  Price
-  Category
-  ImagePath
+  Name VARCHAR(255)
+  Description VARCHAR(500)
+  Price DECIMAL(16, 6)
+  ~ Category VARCHAR(255)
+  Status INT
+  Imagepath VARCHAR(255)
 }
 
-entity "Order_Items" as OrderItems {
-  +ID (PK)
+entity "Payment" {
+  + ID : SERIAL
   --
-  OrderID (FK)
-  ProductID (FK)
-  Quantity
+  PaymentType INT
+  CreatedAt TIMESTAMP WITH TIME ZONE
+  Status INT
 }
 
-entity "Order" as Order {
-  +ID (PK)
+entity "Order" {
+  + ID : SERIAL
   --
-  CustomerID (FK)
-  PaymentID (FK)
-  Status
-  CreatedAt
-  UpdatedAt
-  Total
+  CustomerID INT
+  PaymentID INT
+  ~ Status INT
+  CreatedAt TIMESTAMP WITH TIME ZONE
+  UpdatedAt TIMESTAMP WITH TIME ZONE
+  Total DECIMAL(16, 6)
 }
 
-entity "Payment" as Payment {
-  +ID (PK)
-  --
-  PaymentType
-  CreatedAt
+entity "Order_Items" {
+  + OrderID INT
+  + ProductID INT
+  Quantity INT
 }
 
-Customer -- Order
-Order -- OrderItems
-Order -- Payment
-OrderItems -- Product
+Customer ||--o{ Order : CustomerID
+Order ||--o{ Payment : PaymentID
+Order ||--{ Order_Items : OrderID
+Product ||--{ Order_Items : ProductID
 
 @enduml
