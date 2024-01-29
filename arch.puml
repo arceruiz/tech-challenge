@@ -1,0 +1,54 @@
+@startuml
+
+node "Kubernetes" {
+    [Order Service] as OrderService
+    [Payment Service] as PaymentService
+    [Product Service] as ProductService
+    [User Service] as UserService
+    [BFF] as bff <<fake app>>
+}
+
+node "Lambda" {
+    [Auth Service] as Auth
+}
+
+node "MongoDB Server" {
+    database "Payments" as Payments{
+      frame "Payment" {
+      }
+    }
+    database "Orders" as Orders{
+      frame "Order" {
+      }
+    }
+    database "Products" as Products {
+      frame "Product" {
+      }
+    }
+}
+
+node "PostgreSQL Server" {
+    database "UserPostgres" as UserPostgres {
+        frame "Foo" {
+        }
+    }
+}
+
+OrderService --> Orders
+OrderService -left-> PaymentService : "create"
+PaymentService -right-> OrderService : "Update Status"
+PaymentService --> Payments
+UserService --> UserPostgres
+ProductService --> Products
+Auth --> UserPostgres
+bff ..> OrderService
+bff ..> ProductService
+bff ..> UserService
+bff ..> Auth
+bff ..> PaymentService
+note left of bff
+    This app does not exist it
+    only simulates the BFF calls
+end note
+
+@enduml
